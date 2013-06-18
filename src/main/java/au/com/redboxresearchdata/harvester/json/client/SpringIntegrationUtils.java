@@ -1,4 +1,4 @@
-package au.com.redboxresearchdata.havester.json.client;
+package au.com.redboxresearchdata.harvester.json.client;
 
 import java.io.File;
 import java.util.ArrayList;

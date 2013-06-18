@@ -1,0 +1,85 @@
+<!--  
+Configuration file for harvesting CSV files on a directory specified by system property "csvjdbc.source"
+
+To test, ensure the CSV files are in the harvest directory then execute the Main class with "csvjdbc" in the parameter and set the required system properties. 
+
+Required system properties:
+
+csvjdbc.source - Specified the harvest directory of csv files
+
+ -->
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:int="http://www.springframework.org/schema/integration"
+    xmlns:int-jms="http://www.springframework.org/schema/integration/jms"
+    xmlns:int-jdbc="http://www.springframework.org/schema/integration/jdbc" 
+    xmlns:jdbc="http://www.springframework.org/schema/jdbc"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans
+            http://www.springframework.org/schema/beans/spring-beans.xsd
+            http://www.springframework.org/schema/integration
+            http://www.springframework.org/schema/integration/spring-integration.xsd
+            http://www.springframework.org/schema/integration/jms
+            http://www.springframework.org/schema/integration/jms/spring-integration-jms.xsd 
+            http://www.springframework.org/schema/integration/jdbc 
+            http://www.springframework.org/schema/integration/jdbc/spring-integration-jdbc.xsd">
+
+	<bean id="connectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
+        <property name="brokerURL">
+            <value>tcp://localhost:9201</value>
+        </property>
+    </bean>
+    <bean id="requestQueue" class="org.apache.activemq.command.ActiveMQQueue">
+		<constructor-arg value="jsonHarvester"/>
+	</bean>
+	
+	<int-jdbc:inbound-channel-adapter query="SELECT * FROM Services"
+    channel="servicesIn" data-source="dataSource" >
+    	<int:poller trigger="runOnceTrigger_Service"/>
+    </int-jdbc:inbound-channel-adapter>    
+    
+    <int-jdbc:inbound-channel-adapter query="SELECT * FROM People_Sample"
+    channel="peopleIn" data-source="dataSource" >
+    	<int:poller trigger="runOnceTrigger_People"/>
+    </int-jdbc:inbound-channel-adapter>
+	
+	<int:header-enricher input-channel="servicesIn" output-channel="jdbcIn">
+	    <int:header name="type" value="Service"/>	     
+	</int:header-enricher>
+	
+	<int:header-enricher input-channel="peopleIn" output-channel="jdbcIn">
+	    <int:header name="type" value="People"/>	     
+	</int:header-enricher>
+		
+	<int:transformer id="jdbcToJson" input-channel="jdbcIn"
+		output-channel="jdbcHarvestChannel" ref="transformationHandler" method="handleJdbc" />
+		
+	 <int-jms:outbound-channel-adapter id="jmsOut" destination="requestQueue" channel="jdbcHarvestChannel"/> 
+	
+	<int:channel id="jdbcHarvestChannel">
+		<int:interceptors>
+			<int:wire-tap channel="jdbcloggingChannel" />
+			<ref bean="runOnceInterceptor"/>											
+		</int:interceptors>
+	</int:channel> 
+
+	<int:logging-channel-adapter id="jdbcloggingChannel"
+		expression="'Processing JDBC record of type:' + headers.type" />
+
+	<bean id="transformationHandler"
+		class="au.com.redboxresearchdata.harvester.json.transformer.JsonTransformationHandler" />
+				
+	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+		<property name="driverClassName" value="org.relique.jdbc.csv.CsvDriver" />
+		<property name="url" value="jdbc:relique:csv:#{systemProperties['csvjdbc.source']}" />
+	</bean>
+	
+	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+	
+	<bean id="runOnceTrigger_People" class="au.com.redboxresearchdata.harvester.json.trigger.RunOnceTrigger"/>
+	<bean id="runOnceTrigger_Service" class="au.com.redboxresearchdata.harvester.json.trigger.RunOnceTrigger"/>
+		
+	<bean id="runOnceInterceptor" class="au.com.redboxresearchdata.harvester.json.interceptor.RunOnceInterceptorAdapter" />			
+</beans>

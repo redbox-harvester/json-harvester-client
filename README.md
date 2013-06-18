@@ -1,16 +1,11 @@
 JSON File Harvester Client for Redbox/Mint - Using Spring Integration
 ================================================================================
 
-This application monitors the "input" directory for JSON files and sends the contents over to the ActiveMQ channel. The file is then moved over to the "output" directory.
+Exemplar command-line implementation of a client for JSON Harvester (https://github.com/redbox-mint-contrib/plugin-harvester-json)
 
-The implementation does not validate the JSON structure prior to sending and assumes it is successfully harvested.
-   
-You can run the application by either
+The client has several harvesting modes specified by the single parameter required by the Main class. Current modes are "file", "jdbc", "csvjdbc".
 
-* running the "Main" class from within STS (Right-click on Main class --> Run As --> Java Application)
-* or from the command line:
-    - mvn package
-    - mvn exec:java
+For details on each mode, please browse the configuration file at https://github.com/redbox-mint-contrib/json-file-harvester-client/tree/master/src/main/resources/META-INF/
 
 --------------------------------------------------------------------------------
 
