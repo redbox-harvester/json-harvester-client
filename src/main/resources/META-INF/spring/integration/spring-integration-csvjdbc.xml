@@ -4,11 +4,14 @@
     xmlns:int="http://www.springframework.org/schema/integration"
     xmlns:int-jms="http://www.springframework.org/schema/integration/jms"
     xmlns:int-jdbc="http://www.springframework.org/schema/integration/jdbc" 
+    xmlns:int-file="http://www.springframework.org/schema/integration/file"  
     xmlns:jdbc="http://www.springframework.org/schema/jdbc"
     xsi:schemaLocation="http://www.springframework.org/schema/beans
             http://www.springframework.org/schema/beans/spring-beans.xsd
             http://www.springframework.org/schema/integration
             http://www.springframework.org/schema/integration/spring-integration.xsd
+            http://www.springframework.org/schema/integration/file
+            http://www.springframework.org/schema/integration/file/spring-integration-file.xsd
             http://www.springframework.org/schema/integration/jms
             http://www.springframework.org/schema/integration/jms/spring-integration-jms.xsd 
             http://www.springframework.org/schema/integration/jdbc 
@@ -24,6 +27,7 @@ Required system properties:
 csvjdbc.source - Specified the harvest directory of csv files
 
  -->
+ 	<!--  Destination  -->
 	<bean id="connectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
         <property name="brokerURL">
             <value>tcp://localhost:9201</value>
@@ -33,53 +37,67 @@ csvjdbc.source - Specified the harvest directory of csv files
 		<constructor-arg value="jsonHarvester"/>
 	</bean>
 	
-	<int-jdbc:inbound-channel-adapter query="SELECT * FROM Services"
-    channel="servicesIn" data-source="dataSource" >
-    	<int:poller trigger="runOnceTrigger_Service"/>
-    </int-jdbc:inbound-channel-adapter>    
-    
-    <int-jdbc:inbound-channel-adapter query="SELECT * FROM People_Sample"
-    channel="peopleIn" data-source="dataSource" >
-    	<int:poller trigger="runOnceTrigger_People"/>
-    </int-jdbc:inbound-channel-adapter>
+	<!--  File-related configuration -->
+	<int-file:inbound-channel-adapter id="filesIn" directory="${harvest.directory}" filename-pattern="*.csv">
+		<int:poller id="poller" fixed-rate="5000" max-messages-per-poll="10" />
+	</int-file:inbound-channel-adapter>
 	
-	<int:header-enricher input-channel="servicesIn" output-channel="jdbcIn">
-	    <int:header name="type" value="Service"/>	     
-	</int:header-enricher>
+	<int:chain input-channel="filesIn" output-channel="tablesIn" >
+		<int:transformer  ref="transformationHandler" method="handleFileHeaders" />
+		<int:service-activator ref="csvjdbcBridge" method="addTable"/>
+	</int:chain>
 	
-	<int:header-enricher input-channel="peopleIn" output-channel="jdbcIn">
-	    <int:header name="type" value="People"/>	     
-	</int:header-enricher>
+	<int:chain input-channel="tablesIn" output-channel="jdbcHarvestChannel">
+		<int:header-enricher>
+			<int:header name="type" method="getType" ref="csvjdbcBridge" />
+			<int:header name="original_file" method="getOriginalFile" ref="csvjdbcBridge" />
+		</int:header-enricher>
+		<int:transformer ref="transformationHandler" method="handleJdbc" />
+		<int:service-activator ref="csvjdbcBridge" method="moveSourceFile"/>
+	</int:chain>
 		
-	<int:transformer id="jdbcToJson" input-channel="jdbcIn"
-		output-channel="jdbcHarvestChannel" ref="transformationHandler" method="handleJdbc" />
-		
-	 <int-jms:outbound-channel-adapter id="jmsOut" destination="requestQueue" channel="jdbcHarvestChannel"/> 
+	<!--  JDBC configuration -->
+	<int-jdbc:inbound-channel-adapter query="SELECT * FROM table" channel="tablesIn" data-source="dataSource" >
+    	<int:poller trigger="csvjdbcBridge"/>
+    </int-jdbc:inbound-channel-adapter>     
 	
 	<int:channel id="jdbcHarvestChannel">
 		<int:interceptors>
 			<int:wire-tap channel="jdbcloggingChannel" />
-			<ref bean="runOnceInterceptor"/>											
+			<ref bean="shutdowner"/>											
 		</int:interceptors>
 	</int:channel> 
+	
+	<int-jms:outbound-channel-adapter id="jmsOut" destination="requestQueue" channel="jdbcHarvestChannel"/>
 
-	<int:logging-channel-adapter id="jdbcloggingChannel"
-		expression="'Processing JDBC record of type:' + headers.type" />
+	<int:logging-channel-adapter id="jdbcloggingChannel" expression="'Processing JDBC record of type:' + headers.type" />
+	
+	<!--  Bean configuration -->
 
-	<bean id="transformationHandler"
-		class="au.com.redboxresearchdata.harvester.json.transformer.JsonTransformationHandler" />
-				
+	<bean id="transformationHandler" class="au.com.redboxresearchdata.harvester.json.transformer.JsonTransformationHandler" />
+			
 	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
 		<property name="driverClassName" value="org.relique.jdbc.csv.CsvDriver" />
-		<property name="url" value="jdbc:relique:csv:#{systemProperties['csvjdbc.source']}" />
+		<property name="url" value="jdbc:relique:csv:class:au.com.redboxresearchdata.harvester.csvjdbc.CsvFileReader" />
 	</bean>
 	
 	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
 		<property name="dataSource" ref="dataSource" />
 	</bean>
 	
-	<bean id="runOnceTrigger_People" class="au.com.redboxresearchdata.harvester.json.trigger.RunOnceTrigger"/>
-	<bean id="runOnceTrigger_Service" class="au.com.redboxresearchdata.harvester.json.trigger.RunOnceTrigger"/>
-		
-	<bean id="runOnceInterceptor" class="au.com.redboxresearchdata.harvester.json.interceptor.RunOnceInterceptorAdapter" />			
+	<bean id="csvjdbcBridge" class="au.com.redboxresearchdata.harvester.csvjdbc.CsvJdbcBridge">
+		<constructor-arg value="${harvest.queueCapacity}"/>
+		<property name="channelInterceptor" ref="shutdowner"/>
+		<property name="config" value="#{placeholderProperties.config}" />
+	</bean>
+	
+	<bean id="shutdowner" class="au.com.redboxresearchdata.util.integration.interceptor.TransmissionInterceptorAdapter">
+		<property name="shouldCountPresending" value="false" />
+	</bean>
+	
+	<bean id="placeholderProperties" class="au.com.redboxresearchdata.util.config.ConfigSlurperPlaceholderConfigurer">
+		<property name="environment" value="#{systemProperties['environment']}"/>
+		<property name="defaultEnvironment" value="production" />
+		<property name="location" value="#{systemProperties['harvester.client.config.file']}" />
+	</bean>			
 </beans>

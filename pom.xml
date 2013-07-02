@@ -8,7 +8,7 @@
 	<packaging>jar</packaging>
 
 	<name>json-file-harvester-client</name>
-	<url>http://www.springsource.org/spring-integration</url>
+	<url>https://github.com/redbox-mint-contrib/json-harvester-client</url>
 
 	<prerequisites>
 		<maven>2.2.1</maven>
@@ -21,6 +21,8 @@
 		<log4j.version>1.2.17</log4j.version>
 		<junit.version>4.11</junit.version>
 		<project.version>1.0.0.BUILD-SNAPSHOT</project.version>
+		<types.version>1.0.0.BUILD-SNAPSHOT</types.version>
+		<utilities.version>1.0.0.BUILD-SNAPSHOT</utilities.version>
 	</properties>
 
 	<repositories>
@@ -143,11 +145,19 @@
 			<version>${activemq.version}</version>
 		</dependency>
 		
-		<!--  Redbox Types -->
+		<!--  Data Types -->
 		<dependency>
 			<groupId>au.com.redboxresearchdata</groupId>
   			<artifactId>types</artifactId>
-  			<version>${project.version}</version>
+  			<version>${types.version}</version>
+			<scope>compile</scope>  			
+		</dependency>
+		
+		<!--  Custom utils -->
+		<dependency>
+			<groupId>au.com.redboxresearchdata</groupId>
+  			<artifactId>utilities</artifactId>
+  			<version>${utilities.version}</version>
 			<scope>compile</scope>  			
 		</dependency>
 		
@@ -157,6 +167,7 @@
 	      <groupId>net.sourceforge.csvjdbc</groupId>
 	      <artifactId>csvjdbc</artifactId>
 	      <version>1.0.13</version>
+	      <scope>compile</scope>
 	    </dependency>		
 		            
 		<!-- Logging -->

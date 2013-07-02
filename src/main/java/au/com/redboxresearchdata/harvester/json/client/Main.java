@@ -1,5 +1,6 @@
 package au.com.redboxresearchdata.harvester.json.client;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -8,6 +9,8 @@ import java.util.Scanner;
 import org.apache.log4j.Logger;
 import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+import au.com.redboxresearchdata.util.config.Config;
 
 
 /**
@@ -46,20 +49,37 @@ public final class Main {
 			displayOptions();
 			return;
 		}
-		String contextFile = "spring-integration-"+clientType+".xml";
+		String contextFilePath = "spring-integration-"+clientType+".xml";
+		String configFilePath = "config/config-" +clientType+".groovy";
+		String environment = System.getProperty("environment");
 		if (LOGGER.isInfoEnabled()) {
 			LOGGER.info("\n========================================================="
 					  + "\n                                                         "
 					  + "\n     Welcome to ReDBox / Mint JSON Harvester Client      "
 					  + "\n                                                         "
 					  + "\n     You have selected: "+ clientType 
-					  + "\n     Using configuration file: " + contextFile
+					  + "\n     Using context configuration file: " + contextFilePath
+					  + "\n     Using default configuration file: " + configFilePath
+					  + "\n     Using environment: " + environment
 					  + "\n                                                         "
 					  + "\n=========================================================" );
 		}
 
+		System.setProperty("environment", environment);
+		System.setProperty("harvester.client.config.file", configFilePath);
+		
+		Config.getConfig(environment, configFilePath);
+		
+		String absContextPath = "config/integration/" + contextFilePath;
+		File contextFile = new File(absContextPath);
+		if (!contextFile.exists()) {
+			absContextPath = "classpath:META-INF/spring/integration/" + contextFilePath;
+		} else {
+			absContextPath = "file:" + absContextPath; 
+		}
+		
 		final AbstractApplicationContext context =
-				new ClassPathXmlApplicationContext("classpath:META-INF/spring/integration/" + contextFile);
+				new ClassPathXmlApplicationContext(absContextPath);
 
 		context.registerShutdownHook();
 
