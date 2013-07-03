@@ -14,32 +14,17 @@
             http://www.springframework.org/schema/integration/jdbc 
             http://www.springframework.org/schema/integration/jdbc/spring-integration-jdbc.xsd">
 <!-- 
-Configuration file for harvesting from a DB table using  JDBC. MySQL is currently specified. 
+Configuration file for harvesting from a DB table using  JDBC.
 
-To execute, specify "jdbc" in the parameter and set the required system properties.
-
-Required system properties:
-
-jdbc.dbname - Specified the directory of csv files
-jdbc.user - username
-jdbc.pw - password
-
+To execute, specify "jdbc" in the parameter and set the required system configuration.
  -->
-	<bean id="connectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
-        <property name="brokerURL">
-            <value>tcp://localhost:9201</value>
-        </property>
-    </bean>
-    <bean id="requestQueue" class="org.apache.activemq.command.ActiveMQQueue">
-		<constructor-arg value="jsonHarvester"/>
-	</bean>
 	
-	<int-jdbc:inbound-channel-adapter query="SELECT * FROM services_view"
+	<int-jdbc:inbound-channel-adapter query="${jdbc.service.query}"
     channel="servicesIn" data-source="dataSource"
-    update="UPDATE services set Processed='Y' where id in (:id)" />
+    update="${jdbc.service.update}" />
     
-    <poller default="true" max-messages-per-poll="1" receive-timeout="5000"
-		fixed-delay="5000"
+    <poller default="true" max-messages-per-poll="${jdbc.poller.max-messages-per-poll}" receive-timeout="${jdbc.poller.receive-timeout}"
+		fixed-delay="${jdbc.poller.fixed-delay}"
 		xmlns="http://www.springframework.org/schema/integration">
 		<transactional isolation="SERIALIZABLE" />
 	</poller>
@@ -67,14 +52,26 @@ jdbc.pw - password
 		
 		
 	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
-		<property name="driverClassName" value="com.mysql.jdbc.Driver" />
-		<property name="url" value="jdbc:mysql://localhost/#{systemProperties['jdbc.dbname']}" />
-		<property name="username" value="#{systemProperties['jdbc.user']}" />
-		<property name="password" value="#{systemProperties['jdbc.pw']}" />
+		<property name="driverClassName" value="${jdbc.driver}" />
+		<property name="url" value="${jdbc.url}" />
+		<property name="username" value="${jdbc.user}" />
+		<property name="password" value="${jdbc.pw}" />
 	</bean>
 	
 	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
 		<property name="dataSource" ref="dataSource" />
 	</bean>
 	
+	<bean id="placeholderProperties" class="au.com.redboxresearchdata.util.config.ConfigSlurperPlaceholderConfigurer">
+		<property name="environment" value="#{systemProperties['environment']}"/>
+		<property name="defaultEnvironment" value="production" />
+		<property name="location" value="#{systemProperties['harvester.client.config.file']}" />
+	</bean>			
+	
+	<bean id="connectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
+        <property name="brokerURL" value="${activemq.url}" />
+    </bean>
+    <bean id="requestQueue" class="org.apache.activemq.command.ActiveMQQueue">
+		<constructor-arg value="jsonHarvester"/>
+	</bean>
 </beans>

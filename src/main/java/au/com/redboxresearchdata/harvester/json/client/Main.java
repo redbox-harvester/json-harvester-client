@@ -31,7 +31,20 @@ import au.com.redboxresearchdata.util.config.Config;
 
 
 /**
- * Starts the Spring Context and will initialize the Spring Integration routes.
+ * Starts the Spring Context and will initialize the Spring Integration routes. 
+ * 
+ * The class expects a single command line argument: the client type. It also expects an system property: "environment", that is used in the environment-aware configuration.
+ * 
+ * This class attempts to load the default config file from the current working directory: "config/config-<client type command line argument>.groovy".
+ * Failing this, it will finally load the same default config file path from the classpath .
+ * 
+ * The client type argument controls which integration routes are loaded, located at "config/integration/spring-integration-<client type>.xml". 
+ * The relative path is initially loaded from the current working directory. Failing this, it will load it from the classpath.
+ * 
+ * The client type argument also dictates how this class behaves:
+ * 
+ * "file", "jdbc" - interactive mode, will continue to poll until "q" is pressed.
+ * "csvjdbc" - will process all valid files in the "{harvest.directory}" and then exit.
  *
  * @author Shilo Banihit
  * @since 1.0
@@ -49,7 +62,7 @@ public final class Main {
 		LOGGER.info("Please select an option: " + clientTypes.toString());
 	}
 	/**
-	 * Load the Spring Integration Application Context
+	 * Load the Spring Integration Application Context. 
 	 *
 	 * @param args - command line arguments
 	 */
@@ -90,7 +103,7 @@ public final class Main {
 		String absContextPath = "config/integration/" + contextFilePath;
 		File contextFile = new File(absContextPath);
 		if (!contextFile.exists()) {
-			absContextPath = "classpath:META-INF/spring/integration/" + contextFilePath;
+			absContextPath = "classpath:"+absContextPath;
 		} else {
 			absContextPath = "file:" + absContextPath; 
 		}

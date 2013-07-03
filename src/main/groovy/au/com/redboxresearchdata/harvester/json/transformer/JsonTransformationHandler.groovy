@@ -45,6 +45,15 @@ class JsonTransformationHandler {
 
 	private static final Logger log = Logger.getLogger(JsonTransformationHandler.class)
 	
+	/**
+	 * Default file handler: loads the contents of the file as message payload.
+	 * 
+	 * Sets the filename, file size, file extension, filename without extension as headers.
+	 * It also sets the FileHeaders.ORIGINAL_FILE File reference.
+	 * 
+	 * @param inputMessage
+	 * @return
+	 */
 	@Transformer
 	public Message<String> handleFile(final Message<File> inputMessage) {
 
@@ -71,6 +80,14 @@ class JsonTransformationHandler {
 		return message
 	}
 	
+	/**
+	 *  Sets the headers specified at {@link #handleFile(Message<File>)}, but places the File reference to the payload.
+	 * 
+	 *  Also sets a "type" header: the file name less the extension.
+	 *  
+	 * @param inputMessage
+	 * @return
+	 */
 	@Transformer
 	public Message<File> handleFileHeaders(final Message<File> inputMessage) {
 		final File inputFile = inputMessage.getPayload()
@@ -90,15 +107,23 @@ class JsonTransformationHandler {
 		return message
 	}
 		
+	/**
+	 * Used to transform a JDBC result set to a JSON harvest request message. 
+	 * 
+	 * Requires a "type" header that specifies the data type of the result set.
+	 *  
+	 * @param payload
+	 * @param type
+	 * @return JSON harvest request message.
+	 */
 	@Transformer
-	public Message<String> handleJdbc(@Payload List<Map> payload, @Header("type") String type, @Header("original_file") origFile) {		
+	public Message<String> handleJdbc(@Payload List<Map> payload, @Header("type") String type) {		
 		String data = TypeFactory.buildJsonStr(payload, type)
 		if (log.isDebugEnabled()) {
 			log.debug("JSON message payload: ${data}")
 		}
 		final Message<String> message = MessageBuilder.withPayload(data)
 				.setHeader("type", type)
-				.setHeader("original_file", origFile)
 				.build()
 
 		return message
@@ -112,6 +137,7 @@ class JsonTransformationHandler {
 		}
 		final Message<String> message = MessageBuilder.withPayload(data)
 				.setHeader("type", type)
+				.setHeader("original_file", origFile)
 				.setHeader(FileHeaders.ORIGINAL_FILE, origFile)
 				.build()
 

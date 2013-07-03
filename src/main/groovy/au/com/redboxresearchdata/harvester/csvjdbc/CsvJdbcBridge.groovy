@@ -38,27 +38,50 @@ import org.springframework.integration.Message
 import org.springframework.integration.support.MessageBuilder
 import org.springframework.jdbc.core.namedparam.AbstractSqlParameterSource;
 /**
- * Bridges Spring Integration's file and jdbc mechanisms for CSVJDBC driver.
- *  
+ * Bridges Spring Integration's file and JDBC mechanisms for CSVJDBC's file-specific awareness.
+ * 
+ * The assumption is that the instance is used in linear fashion, as in a chain.
  * 
  * @author Shilo Banihit
  * @since 1.0
  */
-class CsvJdbcBridge extends AbstractSqlParameterSource implements TableReader, Trigger {
+class CsvJdbcBridge implements TableReader, Trigger {
 
 	private static final Logger log = Logger.getLogger(CsvJdbcBridge.class)
-	
+	/**
+	 * The current entry reference.
+	 */
 	Expando currentEntry
+	/**
+	 * Blocking queue of entries.
+	 */
 	ArrayBlockingQueue<Expando> queue
+	/**
+	 * The interceptor reference
+	 */
 	TransmissionInterceptorAdapter channelInterceptor
+	/**
+	 * The config object
+	 */
 	ConfigObject config
 	
+	/**
+	 * Creates a bridge with the initial capacity.
+	 * 
+	 * @param queueCapacity
+	 */
 	public CsvJdbcBridge(String queueCapacity) {
 		log.info("Creating queue with capacity:${queueCapacity}")
 		queue = new ArrayBlockingQueue<Expando>(Integer.parseInt(queueCapacity))
 		CsvFileReader._readerDelegate = this
 	}
 	
+	/**
+	 * Used to add an entry to the queue.
+	 * 
+	 * @param tableName
+	 * @param file
+	 */
 	public void addTable(@Header("type") String tableName, @Payload File file) {
 		def entry = new Expando()
 		entry.table = tableName
@@ -70,14 +93,35 @@ class CsvJdbcBridge extends AbstractSqlParameterSource implements TableReader, T
 		}
 	}
 	
-	public String getType(payload) {
+	/**
+	 * Used to get the table name of the current entry.
+	 * 
+	 * @param payload
+	 * @return
+	 */
+	public String getTable(payload) {
 		return currentEntry.table
 	}
 	
+	/**
+	 * Gets the File reference of the current entry.
+	 *   
+	 * @param payload
+	 * @return
+	 */
 	public File getOriginalFile(payload) {
 		return currentEntry.file
 	}
-	
+	/**
+	 * Moves/renames the source file, and returns the original message.
+	 * 
+	 * Can be used by service activators in a chain.
+	 * 
+	 * @param message
+	 * @param file
+	 * @param table
+	 * @return
+	 */
 	public Message<?> moveSourceFile(Message<?> message, @Header("original_file") file, @Header("type") table) {
 		if (file == null) {
 			log.error("Tried to move source file with no valid file reference.")
@@ -94,6 +138,11 @@ class CsvJdbcBridge extends AbstractSqlParameterSource implements TableReader, T
 		return message
 	}
 	
+	/**
+	 * Method called by CSVJDBC driver when executing a SQL statement.
+	 * 
+	 * Pops the head of the queue and sets it as the current entry being processed. 
+	 */
 	@Override
 	public Reader getReader(Statement statement, String tableName) throws SQLException {
 		def entry = queue.take()
@@ -101,11 +150,21 @@ class CsvJdbcBridge extends AbstractSqlParameterSource implements TableReader, T
 		return new FileReader(entry.file)
 	}
 
+	/**
+	 * Method called by CSVJDBC driver. Returns empty list.
+	 * 
+	 */
 	@Override
 	public List<String> getTableNames(Connection conn) throws SQLException {
 		return new ArrayList<String>()
 	}
 
+	/**
+	 * Called by the poller to determine the next execution time. 
+	 * 
+	 * Implementation blocks the poller until an entry is pushed to the queue.
+	 * 
+	 */
 	@Override
 	public Date nextExecutionTime(TriggerContext arg0) {
 		synchronized(this) {
@@ -115,21 +174,4 @@ class CsvJdbcBridge extends AbstractSqlParameterSource implements TableReader, T
 		}
 		return new Date(System.currentTimeMillis())
 	}
-
-	@Override
-	public Object getValue(String param) throws IllegalArgumentException {
-		if (param.equals("table")) {
-			return currentTable
-		}
-		return currentTable
-	}
-
-	@Override
-	public boolean hasValue(String param) {
-		if (param.equalsIgnoreCase("table")) {
-			return true
-		}
-		return true
-	}
-
 }

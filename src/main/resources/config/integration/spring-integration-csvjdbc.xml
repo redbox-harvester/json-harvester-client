@@ -29,7 +29,7 @@ csvjdbc.source - Specified the harvest directory of csv files
  -->	
 	<!--  File-related configuration -->
 	<int-file:inbound-channel-adapter id="filesIn" directory="${harvest.directory}" filename-pattern="*.csv">
-		<int:poller id="poller" fixed-rate="5000" max-messages-per-poll="10" />
+		<int:poller id="poller" fixed-rate="${harvest.pollRate}" max-messages-per-poll="${harvest.queueCapacity}" />
 	</int-file:inbound-channel-adapter>
 	
 	<int:chain input-channel="filesIn" output-channel="tablesIn" >
@@ -39,10 +39,10 @@ csvjdbc.source - Specified the harvest directory of csv files
 	
 	<int:chain input-channel="tablesIn" output-channel="jdbcHarvestChannel">
 		<int:header-enricher>
-			<int:header name="type" method="getType" ref="csvjdbcBridge" />
+			<int:header name="type" method="getTable" ref="csvjdbcBridge" />
 			<int:header name="original_file" method="getOriginalFile" ref="csvjdbcBridge" />
 		</int:header-enricher>
-		<int:transformer ref="transformationHandler" method="handleJdbc" />
+		<int:transformer ref="transformationHandler" method="handleCsvJdbc" />
 		<int:service-activator ref="csvjdbcBridge" method="moveSourceFile"/>
 	</int:chain>
 		
@@ -93,7 +93,7 @@ csvjdbc.source - Specified the harvest directory of csv files
 	
  	<!--  Destination  -->
 	<bean id="connectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
-        <property name="brokerURL" value="#{placeholderProperties.config.activemq.url}" />
+        <property name="brokerURL" value="${activemq.url}" />
     </bean>
     <bean id="requestQueue" class="org.apache.activemq.command.ActiveMQQueue">
 		<constructor-arg value="jsonHarvester"/>

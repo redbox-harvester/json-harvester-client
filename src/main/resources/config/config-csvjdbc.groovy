@@ -7,6 +7,7 @@ environments {
 		harvest {
 			directory = "input"
 			queueCapacity = 10
+			pollRate = 5000
 			output {
 				directory = "output/"
 				dateFormat = "yyyy-MM-dd_HHmmssSSS"

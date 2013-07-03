@@ -20,21 +20,12 @@ The files contents are sent verbatim across the wire.
 To execute, specify "file" in the parameter, and drop a copy of "TestService.json" or "TestServices.json" 
 in the "input" directory.
 
- -->
-	<bean id="connectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
-        <property name="brokerURL">
-            <value>tcp://localhost:9201</value>
-        </property>
-    </bean>
-    <bean id="requestQueue" class="org.apache.activemq.command.ActiveMQQueue">
-		<constructor-arg value="jsonHarvester"/>
-	</bean>
-	
+ -->	
 	<!-- See also: http://static.springsource.org/spring-integration/reference/htmlsingle/#channel-adapter
 		http://www.eaipatterns.com/ChannelAdapter.html -->
 		
-	<int-file:inbound-channel-adapter id="filesIn" directory="file:input" filename-pattern="*.json">
-		<int:poller id="poller" fixed-rate="5000" max-messages-per-poll="10" />
+	<int-file:inbound-channel-adapter id="filesIn" directory="${harvest.directory}" filename-pattern="*.json">
+		<int:poller id="poller" fixed-rate="${harvest.poller.fixed-rate}" max-messages-per-poll="${harvest.poller.max-messages-per-poll}" />
 	</int-file:inbound-channel-adapter>
 
 	<!-- See also: http://static.springsource.org/spring-integration/reference/htmlsingle/#transformer
@@ -63,27 +54,34 @@ in the "input" directory.
 	<int:header-value-router id="fileTypeRouter"
 		header-name="file_extension" input-channel="routingChannel"
 		resolution-required="false" default-output-channel="otherFilesOut">
-		<int:mapping value="xml" channel="xmlFilesOut" />
 		<int:mapping value="json" channel="jsonFilesOut" />
 	</int:header-value-router>
 
 	<!-- See also: http://static.springsource.org/spring-integration/reference/htmlsingle/#channel-adapter
 		http://www.eaipatterns.com/ChannelAdapter.html -->
 	<int-file:outbound-channel-adapter
-		id="jsonFilesOut" directory="file:target/output/json"
-		delete-source-files="true" />
+		id="jsonFilesOut" directory="${harvest.output.json.directory}"
+		delete-source-files="${harvest.output.json.delete-source-files}" />
 	<int-file:outbound-channel-adapter
-		id="otherFilesOut" directory="file:target/output/other"
-		delete-source-files="true" />
-
-	<int-file:outbound-channel-adapter
-		id="xmlFilesOut" directory="file:target/output/xml"
-		delete-source-files="true" />
+		id="otherFilesOut" directory="${harvest.output.other.directory}"
+		delete-source-files="${harvest.output.other.delete-source-files}" />
 
 	<int:logging-channel-adapter id="loggingChannel"
 		expression="'Processing file: ' + headers.file_name + ' (' + headers.file_size + ' bytes) '" />
 
 	<bean id="transformationHandler"
 		class="au.com.redboxresearchdata.harvester.json.transformer.JsonTransformationHandler" />
-	
+		
+	<bean id="placeholderProperties" class="au.com.redboxresearchdata.util.config.ConfigSlurperPlaceholderConfigurer">
+		<property name="environment" value="#{systemProperties['environment']}"/>
+		<property name="defaultEnvironment" value="production" />
+		<property name="location" value="#{systemProperties['harvester.client.config.file']}" />
+	</bean>
+
+	<bean id="connectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
+        <property name="brokerURL" value="${activemq.url}" />
+    </bean>
+    <bean id="requestQueue" class="org.apache.activemq.command.ActiveMQQueue">
+		<constructor-arg value="jsonHarvester"/>
+	</bean>	
 </beans>
