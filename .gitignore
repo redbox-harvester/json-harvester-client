@@ -1,2 +1,4 @@
 /output
 /src/test/resources/config/generated
+/target
+/.settings

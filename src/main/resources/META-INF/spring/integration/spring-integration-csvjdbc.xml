@@ -26,17 +26,7 @@ Required system properties:
 
 csvjdbc.source - Specified the harvest directory of csv files
 
- -->
- 	<!--  Destination  -->
-	<bean id="connectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
-        <property name="brokerURL">
-            <value>tcp://localhost:9201</value>
-        </property>
-    </bean>
-    <bean id="requestQueue" class="org.apache.activemq.command.ActiveMQQueue">
-		<constructor-arg value="jsonHarvester"/>
-	</bean>
-	
+ -->	
 	<!--  File-related configuration -->
 	<int-file:inbound-channel-adapter id="filesIn" directory="${harvest.directory}" filename-pattern="*.csv">
 		<int:poller id="poller" fixed-rate="5000" max-messages-per-poll="10" />
@@ -100,4 +90,12 @@ csvjdbc.source - Specified the harvest directory of csv files
 		<property name="defaultEnvironment" value="production" />
 		<property name="location" value="#{systemProperties['harvester.client.config.file']}" />
 	</bean>			
+	
+ 	<!--  Destination  -->
+	<bean id="connectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
+        <property name="brokerURL" value="#{placeholderProperties.config.activemq.url}" />
+    </bean>
+    <bean id="requestQueue" class="org.apache.activemq.command.ActiveMQQueue">
+		<constructor-arg value="jsonHarvester"/>
+	</bean>
 </beans>
