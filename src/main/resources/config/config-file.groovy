@@ -1,3 +1,13 @@
+/**
+ * JSON file harvest Configuration File
+ * ----------------------------------------------------------------------
+ * PROJECT: JSON File Harvester Client
+ * ----------------------------------------------------------------------
+ *
+ * @author Shilo Banihit
+ *
+ */
+// Environment specific config below...
 environments {
 	development {
 		file {

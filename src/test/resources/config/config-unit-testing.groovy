@@ -1,32 +1,14 @@
 /**
- * CSVJDBC Configuration File
+ * Types Testing Configuration File
  * ----------------------------------------------------------------------
- * PROJECT: JSON File Harvester Client
+ * PROJECT: Types
  * ----------------------------------------------------------------------
- * 
  * @author Shilo Banihit
  *
  */
-// Cross-environment config below...
+// General configuration below...
 environment = environment
 types {
-	/*
-	 *  Fields mapping configuration as:
-	 *
-	 *  ["sourceField" : "destinationField"]
-	 *
-	 *  or
-	 *
-	 *  ["sourceField" : ["destinationField1","destinationField2","destinationField3"], "delim":";"]
-	 *
-	 *  sourceField - the key in the source map
-	 *  destinationField(s) - the property or properties in the type's class
-	 *
-	 *  Optional config:
-	 *
-	 *  delim - the delimiter used to split the data in this field unto the destination fields
-	 *
-	 */
 	Service {
 		fields = [
 			["ID" : "ID"],
@@ -80,10 +62,10 @@ types {
 }
 // Environment specific config below...
 environments {
-	development {
+	test {
 		file {
-			runtimePath = "src/test/resources/config/generated/config-csvjdbc.groovy"
-			customPath = "src/test/resources/config/config-csvjdbc.groovy"
+			runtimePath = "src/test/resources/config/generated/config-unit-testing.groovy"
+			customPath = ""
 		}
 		harvest {
 			/* Please see http://csvjdbc.sourceforge.net/ for details on your options below. */
@@ -98,17 +80,13 @@ environments {
 				directory = "output/"
 				dateFormat = "yyyy-MM-dd_HHmmssSSS"
 			}
-			scripts {			
-				//             "script path" : "configuration path" - pass in an emtpy string config path if you do not want to override the script's default config lookup behavior. 					
-				preAssemble = ["scripts/missingfields.py":"", "scripts/filter.groovy":""]
+			scripts {								
+				preAssemble = ["scripts/filter.groovy":"src/test/resources/config/filter-unit-testing-config.groovy"]
 			}
 		}
 		activemq {
 			url = "tcp://localhost:9201"
 		}
-		
-	}
-	production {
 		
 	}
 }

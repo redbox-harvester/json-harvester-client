@@ -4,7 +4,7 @@
 
 	<groupId>au.com.redboxresearchdata</groupId>
 	<artifactId>json-file-harvester-client</artifactId>
-	<version>${project.version}</version>
+	<version>1.0.0.BUILD-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<name>json-file-harvester-client</name>
@@ -23,6 +23,13 @@
 		<project.version>1.0.0.BUILD-SNAPSHOT</project.version>
 		<types.version>1.0.0.BUILD-SNAPSHOT</types.version>
 		<utilities.version>1.0.0.BUILD-SNAPSHOT</utilities.version>
+		<spring.integration.jms.version>3.1.3.RELEASE</spring.integration.jms.version>
+		<commons-dbcp.version>1.2.2</commons-dbcp.version>
+		<commons-io.version>2.4</commons-io.version>
+		<groovy.version>2.0.4</groovy.version>
+		<csvjdbc.version>1.0.13</csvjdbc.version>
+		<mysql.version>5.1.24</mysql.version>
+		<jython.version>2.5.3</jython.version>
 	</properties>
 
 	<repositories>
@@ -120,7 +127,7 @@
  		 <dependency>
 	      <groupId>org.springframework</groupId>
 	      <artifactId>spring-jms</artifactId>
-	      <version>3.1.3.RELEASE</version>
+	      <version>${spring.integration.jms.version}</version>
 	      <scope>compile</scope>
 	    </dependency>
 	    
@@ -128,13 +135,13 @@
 	    <dependency>
 			<groupId>commons-dbcp</groupId>
 			<artifactId>commons-dbcp</artifactId>
-			<version>1.2.2</version>
+			<version>${commons-dbcp.version}</version>
 		</dependency>
 	    
 	    <dependency>
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
-			<version>5.1.24</version>
+			<version>${mysql.version}</version>
 			<scope>runtime</scope>
 		</dependency>
 		
@@ -166,9 +173,18 @@
 		<dependency>
 	      <groupId>net.sourceforge.csvjdbc</groupId>
 	      <artifactId>csvjdbc</artifactId>
-	      <version>1.0.13</version>
+	      <version>${csvjdbc.version}</version>
 	      <scope>compile</scope>
-	    </dependency>		
+	    </dependency>
+	    
+	    <!-- Jython -->
+	    
+	    <dependency>
+			<groupId>org.python</groupId>
+			<artifactId>jython</artifactId>
+			<version>${jython.version}</version>
+		</dependency>
+		            		
 		            
 		<!-- Logging -->
 
@@ -183,13 +199,13 @@
 		<dependency>
 			<groupId>commons-io</groupId>
 			<artifactId>commons-io</artifactId>
-			<version>2.4</version>
+			<version>${commons-io.version}</version>
 		</dependency>
 		
 		<dependency>
 		    <groupId>org.codehaus.groovy</groupId>
 		    <artifactId>groovy-all</artifactId>
-		    <version>2.0.4</version>
+		    <version>${groovy.version}</version>
 	  	</dependency>
 
 	</dependencies>	

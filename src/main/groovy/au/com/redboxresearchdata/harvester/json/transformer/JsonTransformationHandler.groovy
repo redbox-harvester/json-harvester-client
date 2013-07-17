@@ -118,7 +118,7 @@ class JsonTransformationHandler {
 	 */
 	@Transformer
 	public Message<String> handleJdbc(@Payload List<Map> payload, @Header("type") String type) {		
-		String data = TypeFactory.buildJsonStr(payload, type)
+		String data = TypeFactory.buildJsonStr(payload, type, config)
 		if (log.isDebugEnabled()) {
 			log.debug("JSON message payload: ${data}")
 		}
@@ -129,9 +129,19 @@ class JsonTransformationHandler {
 		return message
 	}
 
+	/**
+	 * Used to transform a CSVJDBC resultset to a JSON harvest request message.
+	 * 
+	 * Please see http://csvjdbc.sourceforge.net/ for details about CSVJDBC
+	 * 
+	 * @param payload
+	 * @param type - a "type" header
+	 * @param origFile - a "original_file" header, specifying the csv File reference or path
+	 * @return  JSON harvest request message.
+	 */
 	@Transformer
-	public Message<String> handleCsvJdbc(@Payload List<Map> payload, @Header("type") String type, @Header("original_file") origfile) {
-		String data = TypeFactory.buildJsonStr(payload, type)
+	public Message<String> handleCsvJdbc(@Payload List<Map> payload, @Header("type") String type, @Header("original_file") origFile) {
+		String data = TypeFactory.buildJsonStr(payload, type, config)
 		if (log.isDebugEnabled()) {
 			log.debug("JSON message payload: ${data}")
 		}
