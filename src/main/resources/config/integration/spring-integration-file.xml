@@ -25,7 +25,7 @@ in the "input" directory.
 		http://www.eaipatterns.com/ChannelAdapter.html -->
 		
 	<int-file:inbound-channel-adapter id="filesIn" directory="${harvest.directory}" filename-pattern="*.json">
-		<int:poller id="poller" fixed-rate="${harvest.poller.fixed-rate}" max-messages-per-poll="${harvest.poller.max-messages-per-poll}" />
+		<int:poller id="poller" fixed-rate="${harvest.pollRate}" max-messages-per-poll="${harvest.queueCapacity}" />
 	</int-file:inbound-channel-adapter>
 
 	<!-- See also: http://static.springsource.org/spring-integration/reference/htmlsingle/#transformer
@@ -61,10 +61,10 @@ in the "input" directory.
 		http://www.eaipatterns.com/ChannelAdapter.html -->
 	<int-file:outbound-channel-adapter
 		id="jsonFilesOut" directory="${harvest.output.json.directory}"
-		delete-source-files="${harvest.output.json.delete-source-files}" />
+		delete-source-files="${harvest.output.json.deletesource}" />
 	<int-file:outbound-channel-adapter
 		id="otherFilesOut" directory="${harvest.output.other.directory}"
-		delete-source-files="${harvest.output.other.delete-source-files}" />
+		delete-source-files="${harvest.output.other.deletesource}" />
 
 	<int:logging-channel-adapter id="loggingChannel"
 		expression="'Processing file: ' + headers.file_name + ' (' + headers.file_size + ' bytes) '" />

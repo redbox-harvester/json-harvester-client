@@ -3,11 +3,11 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>au.com.redboxresearchdata</groupId>
-	<artifactId>json-file-harvester-client</artifactId>
+	<artifactId>json-harvester-client</artifactId>
 	<version>1.0.0.BUILD-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
-	<name>json-file-harvester-client</name>
+	<name>json-harvester-client</name>
 	<url>https://github.com/redbox-mint-contrib/json-harvester-client</url>
 
 	<prerequisites>
@@ -30,6 +30,8 @@
 		<csvjdbc.version>1.0.13</csvjdbc.version>
 		<mysql.version>5.1.24</mysql.version>
 		<jython.version>2.5.3</jython.version>
+		
+		<mainClass>au.com.redboxresearchdata.harvester.json.client.Main</mainClass>
 	</properties>
 
 	<repositories>
@@ -75,15 +77,51 @@
 			        <version>2.7.0-01</version>
 			      </dependency>
 			    </dependencies>
-		  </plugin>
+		  	</plugin>
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>exec-maven-plugin</artifactId>
 				<version>1.2.1</version>
 				<configuration>
-					<mainClass>au.com.redboxresearchdata.havester.json.client.Main</mainClass>
+					<mainClass>${mainClass}</mainClass>
 				</configuration>
 			</plugin>
+		      <plugin>
+		      	<artifactId>maven-assembly-plugin</artifactId>
+		        <version>2.4</version>
+		        <configuration>
+		     		<descriptors>
+		     			<descriptor>zip.xml</descriptor>
+		     		</descriptors>
+		        </configuration>
+		        <executions>
+			      <execution>
+			        <id>make-assembly</id> 
+			        <phase>package</phase> 
+			        <goals>
+			          <goal>single</goal> 
+			        </goals>
+			      </execution>
+			    </executions>
+		      </plugin>
+		      <plugin>
+		        <groupId>org.apache.maven.plugins</groupId>
+		        <artifactId>maven-jar-plugin</artifactId>
+		        <version>2.4</version>
+		        <configuration>
+		         <finalName>${project.name}</finalName>
+		         <excludes>
+		         	<exclude>*test*.class</exclude>
+	         	 </excludes>
+		          <archive>
+		            <manifest>
+		              <addClasspath>true</addClasspath>
+		              <classpathPrefix>lib/</classpathPrefix>
+		              <mainClass>${mainClass}</mainClass>
+		            </manifest>
+		          </archive>
+		        </configuration>
+	        </plugin>
 		</plugins>
 	</build>
 
@@ -208,5 +246,17 @@
 		    <version>${groovy.version}</version>
 	  	</dependency>
 
-	</dependencies>	
+	</dependencies>
+	<distributionManagement>
+		<snapshotRepository>
+			<id>redbox-nexus-snapshots</id>
+			<name>Redbox Nexus Snapshots</name>
+			<url>http://dev.redboxresearchdata.com.au/nexus/content/repositories/snapshots/</url>
+		</snapshotRepository>
+		<repository>
+			<id>redbox-nexus-releases</id>
+			<name>Redbox Nexus Releases</name>
+			<url>http://dev.redboxresearchdata.com.au/nexus/content/repositories/releases/</url>
+		</repository>
+	</distributionManagement>	
 </project>

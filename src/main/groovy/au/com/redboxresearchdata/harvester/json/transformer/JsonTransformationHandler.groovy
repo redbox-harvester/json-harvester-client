@@ -44,6 +44,7 @@ import au.com.redboxresearchdata.types.TypeFactory
 class JsonTransformationHandler {
 
 	private static final Logger log = Logger.getLogger(JsonTransformationHandler.class)
+	ConfigObject config
 	
 	/**
 	 * Default file handler: loads the contents of the file as message payload.
@@ -130,7 +131,7 @@ class JsonTransformationHandler {
 	}
 
 	/**
-	 * Used to transform a CSVJDBC resultset to a JSON harvest request message.
+	 * Used to transform an entire CSVJDBC resultset to a JSON harvest request message.
 	 * 
 	 * Please see http://csvjdbc.sourceforge.net/ for details about CSVJDBC
 	 * 
@@ -151,6 +152,18 @@ class JsonTransformationHandler {
 				.setHeader(FileHeaders.ORIGINAL_FILE, origFile)
 				.build()
 
+		return message
+	}
+	
+	@Transformer
+	public Message<String> handleRecord(@Payload Map payload, @Header("type") String type) {
+		String data = TypeFactory.buildJsonStr(payload, type, config)
+		if (log.isDebugEnabled()) {
+			log.debug("JSON message payload: ${data}")
+		}
+		final Message<String> message = MessageBuilder.withPayload(data)
+		.setHeader("type", type)
+		.build()
 		return message
 	}
 }

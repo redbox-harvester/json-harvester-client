@@ -16,49 +16,45 @@ environments {
 		}
 		harvest {
 			directory = "input"
-			poller {
-				max-messages-per-poll = "10"
-				receive-timeout = "5000"
-			}
+			pollRate = "5000"
+			queueCapacity = "10"
 			output {
 				json {
 					directory = "target/output/json"
-					delete-source-files = "true"
+					deletesource = "true"
 				}
 				other {
 					directory = "target/output/other"
-					delete-source-files = "true"
+					deletesource = "true"
 				}
 			}
 		}
 		activemq {
-			url = "tcp://localhost:9201"
+			url = "tcp://localhost:9101"
 		}
 	}
 	production {
 		file {
 			runtimePath = "config/generated/config-file.groovy"
-			customPath = "config/config-file.groovy"
+			customPath = "config/config-custom-file.groovy"
 		}
 		harvest {
 			directory = "input"
-			poller {
-				max-messages-per-poll = "10"
-				receive-timeout = "5000"
-			}
+			pollRate = "5000"
+			queueCapacity = "10"
 			output {
 				json {
-					directory = "target/output/json"
-					delete-source-files = "true"
+					directory = "output/json"
+					deletesource = "true"
 				}
 				other {
-					directory = "target/output/other"
-					delete-source-files = "true"
+					directory = "output/other"
+					deletesource = "true"
 				}
 			}
 		}
 		activemq {
-			url = "tcp://localhost:9201"
+			url = "tcp://localhost:9101"
 		}
 	}
 }

@@ -28,40 +28,59 @@ csvjdbc.source - Specified the harvest directory of csv files
 
  -->	
 	<!--  File-related configuration -->
-	<int-file:inbound-channel-adapter id="filesIn" directory="${harvest.directory}" filename-pattern="*.csv">
+	<int-file:inbound-channel-adapter id="channel_filesIn" directory="${harvest.directory}" filename-pattern="*.csv">
 		<int:poller id="poller" fixed-rate="${harvest.pollRate}" max-messages-per-poll="${harvest.queueCapacity}" />
 	</int-file:inbound-channel-adapter>
 	
-	<int:chain input-channel="filesIn" output-channel="tablesIn" >
+	<!--  JDBC configuration -->
+	<int-jdbc:inbound-channel-adapter query="SELECT * FROM table" channel="channel_tablesIn" data-source="dataSource" >
+    	<int:poller trigger="csvjdbcBridge"/>
+    </int-jdbc:inbound-channel-adapter>
+    
+    <!--  General configuration  -->
+	<int:chain input-channel="channel_filesIn" output-channel="channel_tablesIn" >
 		<int:transformer  ref="transformationHandler" method="handleFileHeaders" />
 		<int:service-activator ref="csvjdbcBridge" method="addTable"/>
 	</int:chain>
 	
-	<int:chain input-channel="tablesIn" output-channel="jdbcHarvestChannel">
+	<int:chain input-channel="channel_tablesIn" output-channel="channel_requestHarvest">
 		<int:header-enricher>
 			<int:header name="type" method="getTable" ref="csvjdbcBridge" />
 			<int:header name="original_file" method="getOriginalFile" ref="csvjdbcBridge" />
+			<int:header name="is_valid" value="true"/>
 		</int:header-enricher>
-		<int:transformer ref="transformationHandler" method="handleCsvJdbc" />
 		<int:service-activator ref="csvjdbcBridge" method="moveSourceFile"/>
+		<!-- 
+		<int:splitter ref="recSplitter" method="doNothing" />
+		<int:header-value-router header-name="is_valid" default-output-channel="channel_notifyInvalid">
+			<int:mapping value="true" channel="channel_requestHarvest" />
+		</int:header-value-router> -->
 	</int:chain>
-		
-	<!--  JDBC configuration -->
-	<int-jdbc:inbound-channel-adapter query="SELECT * FROM table" channel="tablesIn" data-source="dataSource" >
-    	<int:poller trigger="csvjdbcBridge"/>
-    </int-jdbc:inbound-channel-adapter>     
 	
-	<int:channel id="jdbcHarvestChannel">
+	<!-- 
+	<int:header-value-router id="validityRouter" header-name="is_valid" input-channel="channel_router"
+		resolution-required="false" default-output-channel="channel_notifyInvalid">
+		
+	</int:header-value-router> -->
+	
+	<int:chain input-channel="channel_requestHarvest">
+		<int:transformer ref="transformationHandler" method="handleCsvJdbc" />
+	</int:chain>     
+	
+	<int:channel id="channel_requestHarvest">
 		<int:interceptors>
-			<int:wire-tap channel="jdbcloggingChannel" />
+			<!--  <int:wire-tap channel="channel_logging" /> --> 
 			<ref bean="shutdowner"/>											
 		</int:interceptors>
 	</int:channel> 
 	
-	<int-jms:outbound-channel-adapter id="jmsHarvestOut" destination="harvestQueue" channel="jdbcHarvestChannel"/>
-
-	<int:logging-channel-adapter id="jdbcloggingChannel" expression="'Processing JDBC record of type:' + headers.type" />
+	 <int-file:outbound-channel-adapter id="channel_notifyInvalid"
+    directory="output/"/>
 	
+	<int-jms:outbound-channel-adapter id="jmsHarvestOut" destination="harvestQueue" channel="channel_requestHarvest"/>
+
+	<!--  <int:logging-channel-adapter id="channel_logging" expression="'Processing record of type:' + headers.type" /> -->
+    
 	<!--  Bean configuration -->
 
 	<bean id="transformationHandler" class="au.com.redboxresearchdata.harvester.json.transformer.JsonTransformationHandler">
@@ -81,6 +100,9 @@ csvjdbc.source - Specified the harvest directory of csv files
 		<constructor-arg value="${harvest.queueCapacity}"/>
 		<property name="channelInterceptor" ref="shutdowner"/>
 		<property name="config" value="#{placeholderProperties.config}" />
+	</bean>
+	
+	<bean id="recSplitter" class="au.com.redboxresearchdata.util.splitter.RecordSplitter">
 	</bean>
 	
 	<bean id="shutdowner" class="au.com.redboxresearchdata.util.integration.interceptor.TransmissionInterceptorAdapter">
