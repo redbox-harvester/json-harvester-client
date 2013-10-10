@@ -13,11 +13,17 @@ types {
 	/*
 	 *  Fields mapping configuration as:
 	 *
-	 *  ["sourceField" : "destinationField"]
+	 *  TypeName { 
+	 *     fields = [ ["sourceField" : "destinationField"], ... ]
+	 *     required = ["sourceField", ...]  
+	 *  }
 	 *
 	 *  or
 	 *
-	 *  ["sourceField" : ["destinationField1","destinationField2","destinationField3"], "delim":";"]
+	 *  TypeName { 
+	 *  	fields = [ ["sourceField" : ["destinationField1","destinationField2","destinationField3"], "delim":";"], ... ]
+	 *  	required = ["sourceField", ...] 
+	 *  }
 	 *
 	 *  sourceField - the key in the source map
 	 *  destinationField(s) - the property or properties in the type's class
@@ -25,6 +31,7 @@ types {
 	 *  Optional config:
 	 *
 	 *  delim - the delimiter used to split the data in this field unto the destination fields
+	 *  
 	 *
 	 */
 	Service {

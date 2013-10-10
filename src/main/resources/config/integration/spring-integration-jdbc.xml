@@ -19,12 +19,12 @@ Configuration file for harvesting from a DB table using  JDBC.
 To execute, specify "jdbc" in the parameter and set the required system configuration.
  -->
 	
-	<int-jdbc:inbound-channel-adapter query="${jdbc.service.query}"
+	<int-jdbc:inbound-channel-adapter query="${harvest.jdbc.service.query}"
     channel="servicesIn" data-source="dataSource"
-    update="${jdbc.service.update}" />
+    update="${harvest.jdbc.service.update}" />
     
-    <poller default="true" max-messages-per-poll="${jdbc.poller.max-messages-per-poll}" receive-timeout="${jdbc.poller.receive-timeout}"
-		fixed-delay="${jdbc.poller.fixed-delay}"
+    <poller default="true" max-messages-per-poll="${harvest.queueCapacity}" receive-timeout="${harvest.pollTimeout}"
+		fixed-delay="${harvest.pollRate}"
 		xmlns="http://www.springframework.org/schema/integration">
 		<transactional isolation="SERIALIZABLE" />
 	</poller>
@@ -48,14 +48,16 @@ To execute, specify "jdbc" in the parameter and set the required system configur
 		expression="'Processing JDBC record of type:' + headers.type" />
 
 	<bean id="transformationHandler"
-		class="au.com.redboxresearchdata.harvester.json.transformer.JsonTransformationHandler" />
+		class="au.com.redboxresearchdata.harvester.json.transformer.JsonTransformationHandler" >
+		<property name="config" value="#{placeholderProperties.config}" />
+	</bean>
 		
 		
 	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
-		<property name="driverClassName" value="${jdbc.driver}" />
-		<property name="url" value="${jdbc.url}" />
-		<property name="username" value="${jdbc.user}" />
-		<property name="password" value="${jdbc.pw}" />
+		<property name="driverClassName" value="${harvest.jdbc.driver}" />
+		<property name="url" value="${harvest.jdbc.url}" />
+		<property name="username" value="#{systemProperties['jdbc.user']}" />
+		<property name="password" value="#{systemProperties['jdbc.pw']}" />
 	</bean>
 	
 	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
