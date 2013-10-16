@@ -3,6 +3,10 @@
  "data": {
     "data": {
         "datasetId":"1",
+        "workflowId":"dataset",
+        "workflowStep":"metadata-review",
+        "workflowPageTitle":"Metadata Record",
+        "workflowLabel":"Metadata Review",
         "title": "Test-Record-JSON Harvester",
         "viewId": "default",
         "owner":"admin",
