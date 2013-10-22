@@ -34,6 +34,12 @@
 		<mainClass>au.com.redboxresearchdata.harvester.json.client.Main</mainClass>
 	</properties>
 
+	<parent>
+		<groupId>au.com.redboxresearchdata</groupId>
+    	<artifactId>ci-parent</artifactId>
+    	<version>1.0.0-SNAPSHOT</version>
+	</parent>
+
 	<repositories>
 		<repository>
 			<id>repo.springsource.org.milestone</id>
@@ -247,16 +253,4 @@
 	  	</dependency>
 
 	</dependencies>
-	<distributionManagement>
-		<snapshotRepository>
-			<id>redbox-nexus-snapshots</id>
-			<name>Redbox Nexus Snapshots</name>
-			<url>http://dev.redboxresearchdata.com.au/nexus/content/repositories/snapshots/</url>
-		</snapshotRepository>
-		<repository>
-			<id>redbox-nexus-releases</id>
-			<name>Redbox Nexus Releases</name>
-			<url>http://dev.redboxresearchdata.com.au/nexus/content/repositories/releases/</url>
-		</repository>
-	</distributionManagement>	
 </project>
