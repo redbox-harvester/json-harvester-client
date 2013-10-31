@@ -1,0 +1,1 @@
+java -cp additionalLibs/* -Denvironment=%2 -Drun.mode=%3 -Dlog4j.configuration=prod-log4j.xml -jar json-harvester-client.jar %1

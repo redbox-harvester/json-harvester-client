@@ -26,6 +26,7 @@ import java.util.Scanner;
 import org.apache.log4j.Logger;
 import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.context.support.FileSystemXmlApplicationContext;
 
 import au.com.redboxresearchdata.util.config.Config;
 
@@ -53,13 +54,13 @@ import au.com.redboxresearchdata.util.config.Config;
 public final class Main {
 
 	private static final Logger LOGGER = Logger.getLogger(Main.class);
-	private static final String[] clientTypeArr = {"file", "jdbc","csvjdbc"};
-	private static final ArrayList<String> clientTypes = new ArrayList<String>(Arrays.asList(clientTypeArr));
+	
 
 	private Main() { }
 
 	private static void displayOptions() {
-		LOGGER.info("Please select an option: " + clientTypes.toString());
+		//TODO: determine list of options
+//		LOGGER.info("Please select an option: " + clientTypes.toString());
 	}
 	/**
 	 * Load the Spring Integration Application Context. 
@@ -74,14 +75,12 @@ public final class Main {
 			return;
 		}
 		String clientType = args[0];
-		if (!clientTypes.contains(clientType)) {
-			LOGGER.error("Invalid client type!");
-			displayOptions();
-			return;
-		}
+		
 		String contextFilePath = "spring-integration-"+clientType+".xml";
 		String configFilePath = "config/config-" +clientType+".groovy";
 		String environment = System.getProperty("environment");
+		String runMode = System.getProperty("run.mode");
+		
 		if (LOGGER.isInfoEnabled()) {
 			LOGGER.info("\n========================================================="
 					  + "\n                                                         "
@@ -102,22 +101,25 @@ public final class Main {
 		
 		String absContextPath = "config/integration/" + contextFilePath;
 		File contextFile = new File(absContextPath);
+		final AbstractApplicationContext context;
 		if (!contextFile.exists()) {
 			absContextPath = "classpath:"+absContextPath;
+			context =
+					new ClassPathXmlApplicationContext(absContextPath);
 		} else {
 			absContextPath = "file:" + absContextPath; 
+			context =
+					new FileSystemXmlApplicationContext(absContextPath);
 		}
 		
-		final AbstractApplicationContext context =
-				new ClassPathXmlApplicationContext(absContextPath);
 
 		context.registerShutdownHook();
 
-		if (clientType.equals("file")) {
+		if (clientType.equals("file")|| clientType.equals("riffile")) {
 			SpringIntegrationUtils.displayDirectories(context);
 		}
 		
-		if (clientType.equals("file") || clientType.equals("jdbc")) {
+		if ("daemon".equals(runMode)) {
 			final Scanner scanner = new Scanner(System.in);
 	
 			if (LOGGER.isInfoEnabled()) {
@@ -131,7 +133,7 @@ public final class Main {
 				//Do nothing unless user presses 'q' to quit.
 			}
 			scanner.close();
-		} else if (clientType.equals("csvjdbc")) {			
+		} else {			
 			try {
 				while (context.isRunning()) {
 					Thread.sleep(1000);
