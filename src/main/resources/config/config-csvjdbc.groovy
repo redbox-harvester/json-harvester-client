@@ -107,7 +107,7 @@ environments {
 			}
 			scripts {			
 				//             "script path" : "configuration path" - pass in an emtpy string config path if you do not want to override the script's default config lookup behavior. 					
-				preAssemble = ["scripts/missingfields.py":"", "scripts/filter.groovy":""]
+				preAssemble = [["scripts/missingfields.py":""], ["scripts/filter.groovy":""]]
 			}
 		}
 		activemq {
