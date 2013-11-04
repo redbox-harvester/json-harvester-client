@@ -75,7 +75,7 @@ public final class SpringIntegrationUtils {
 		stringBuilder.append("\n\n=========================================================");
 
 		logger.info(stringBuilder.toString());
-
+		
 	}
 
 }

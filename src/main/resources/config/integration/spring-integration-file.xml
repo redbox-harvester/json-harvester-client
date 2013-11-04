@@ -30,9 +30,14 @@ in the "input" directory.
 
 	<!-- See also: http://static.springsource.org/spring-integration/reference/htmlsingle/#transformer
 		http://www.eaipatterns.com/MessageTranslator.html --> 
-	<int:transformer id="copyFiles" input-channel="filesIn"
+	<!-- <int:transformer id="copyFiles" input-channel="filesIn"
 		output-channel="harvestChannel" ref="transformationHandler" method="handleFile" />
-				
+ -->
+	<int:chain input-channel="filesIn" output-channel="harvestChannel" >
+		<int:transformer ref="transformationHandler" method="handleFile" />
+		<int:service-activator ref="templateService" method="addDefaultValues"/>
+	</int:chain>
+	
 	 <int-jms:outbound-channel-adapter id="jmsOut" destination="requestQueue" channel="harvestChannel"/> 
 	
 	<!-- See also: http://static.springsource.org/spring-integration/reference/htmlsingle/#channel
