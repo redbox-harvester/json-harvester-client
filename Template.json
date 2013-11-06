@@ -1,0 +1,101 @@
+{
+ "type":"DatasetJson",
+ "data": {
+    "data": [
+        {
+        "datasetId":"1",
+        "owner":"admin",
+        "attachmentList" : ["tfpackage", "workflow.metadata"],
+        "customProperties" : ["file.path"],
+        "varMap" : {
+            "file.path" : "${fascinator.home}/packages/<oid>.tfpackage"            
+        },
+        "attachmentDestination" : {
+            "tfpackage":["<oid>.tfpackage","metadata.json","$file.path"], 
+            "workflow.metadata":["workflow.metadata"]
+        },
+        "workflow.metadata" : {
+            "id":"dataset",
+            "step":"metadata-review",
+            "pageTitle":"Metadata Record",
+            "label":"Metadata Review",
+            "formData" : {
+                "title" : "Test-Record-JSON Harvester",
+                "description": "Test description"
+            }                    
+        },
+        
+        {
+        "datasetId":"2",
+        "owner":"admin",
+        "attachmentList" : ["tfpackage", "workflow.metadata"],
+        "customProperties" : ["file.path"],
+        "varMap" : {
+            "file.path" : "${fascinator.home}/packages/<oid>.tfpackage"            
+        },
+        "attachmentDestination" : {
+            "tfpackage":["<oid>.tfpackage","metadata.json","$file.path"], 
+            "workflow.metadata":["workflow.metadata"]
+        },
+        "workflow.metadata" : {
+            "id":"dataset",
+            "step":"metadata-review",
+            "pageTitle":"Metadata Record",
+            "label":"Metadata Review",
+            "formData" : {
+                "title" : "Test-Record-JSON Harvester-2",
+                "description": "Test description-2"
+            }                    
+        },
+        
+        },
+        {
+            "datasetId":"2",
+            "owner":"admin",
+            "command":"delete"                        
+        },
+        {
+          "datasetId":"1",
+          "owner":"admin",
+          "command":"attach",
+          "attachmentList" : ["workflow.metadata"],
+          "attachmentDestination" : {               
+              "workflow.metadata":["workflow.metadata"]
+          },
+          "workflow.metadata" : {
+              "id":"dataset",
+              "step":"live",
+              "pageTitle":"Metadata Record",
+              "label":"Published",
+              "formData" : {
+                  "title" : "Test-Record-JSON Harvester",
+                  "description": "Test description"
+              }
+          }                    
+        },
+        {
+          "datasetId":"1",
+          "owner":"admin",
+          "command":"attach",
+          "attachmentList" : ["workflow.metadata"],
+          "attachmentDestination" : {               
+              "workflow.metadata":["workflow.metadata"]
+          },
+          "workflow.metadata" : {
+              "id":"dataset",
+              "step":"retired",
+              "pageTitle":"Metadata Record",
+              "label":"Retired",
+              "formData" : {
+                  "title" : "Test-Record-JSON Harvester",
+                  "description": "Test description"
+              }
+          }                    
+        },
+        {
+          "datasetId":"3",
+          "owner":"Invalid JSON Document"                              
+        }
+      ]   
+   }
+}

@@ -77,6 +77,9 @@ in the "input" directory.
 	<bean id="transformationHandler"
 		class="au.com.redboxresearchdata.harvester.json.transformer.JsonTransformationHandler" />
 		
+	<bean id="templateService"
+		class="au.com.redboxresearchdata.harvester.json.service.JsonTemplateService" />
+		
 	<bean id="placeholderProperties" class="au.com.redboxresearchdata.util.config.ConfigSlurperPlaceholderConfigurer">
 		<property name="environment" value="#{systemProperties['environment']}"/>
 		<property name="defaultEnvironment" value="production" />

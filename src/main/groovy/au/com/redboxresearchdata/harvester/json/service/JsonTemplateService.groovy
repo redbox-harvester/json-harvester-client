@@ -15,16 +15,20 @@
  *with this program; if not, write to the Free Software Foundation, Inc.,
  *51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  ******************************************************************************/
-package au.com.redboxresearchdata.harvester.service
+package au.com.redboxresearchdata.harvester.json.service
 
 import groovy.json.JsonBuilder
 
 import org.apache.log4j.Logger
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
 import org.springframework.integration.Message
 import org.springframework.integration.annotation.ServiceActivator
 import org.springframework.integration.support.MessageBuilder;
 
-import au.com.redboxresearchdata.harvester.utilitiies.HarvestUtilities;
+import com.google.gson.JsonParser;
+
+import au.com.redboxresearchdata.harvester.utilities.HarvestUtilities;
 
 /* 
  * @author Matt Mulholland
@@ -44,7 +48,7 @@ class JsonTemplateService {
 	 * @return
 	 */
 	@ServiceActivator
-	public Message<String> handleFile(final Message<String> inputMessage) {
+	public Message<String> addDefaultValues(final Message<String> inputMessage) {
 		String inputString = inputMessage.getPayload();
 		String jsonTemplate = """{
 "type":"DatasetJson",
@@ -57,9 +61,13 @@ class JsonTemplateService {
       ]   
    }
 }"""
-
-		String target = HarvestUtilities.deeperMerge(inputString, jsonTemplate)
-		final Message<String> message = MessageBuilder.withPayload(target)
+		JSONParser parser = new JSONParser()
+		JSONObject source = parser.parse(inputString)
+		JSONObject target = parser.parse(jsonTemplate)
+		
+		JSONObject result = HarvestUtilities.deeperMerge(source, target)
+		
+		final Message<String> message = MessageBuilder.withPayload(result.toJSONString()).build()
 		return message;
 	}
 }

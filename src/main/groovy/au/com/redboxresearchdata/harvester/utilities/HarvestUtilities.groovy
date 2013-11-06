@@ -1,4 +1,4 @@
-package au.com.redboxresearchdata.harvester.utilitiies
+package au.com.redboxresearchdata.harvester.utilities
 
 import groovy.json.JsonException
 
@@ -8,7 +8,6 @@ import org.json.simple.JSONAware
 import org.json.simple.JSONObject;
 
 public class HarvestUtilities {
-	private static final Logger log = Logger.getLogger(HarvestUtilities.class);
 	
 	private HarvestUtilities() {
 		throw new IllegalAccessException("utilities class, with only static methods, should not be instantiated.")
