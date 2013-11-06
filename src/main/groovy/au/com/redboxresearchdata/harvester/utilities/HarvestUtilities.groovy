@@ -23,7 +23,7 @@ public class HarvestUtilities {
 	 * @return merged target
 	 * @throws JsonException
 	 */
-	public static JSONObject deeperMerge(final JSONObject src, final JSONObject tgt) throws JsonException {
+	public static JSONObject deeperMerge(final JSONObject src, final JSONObject tgt) {
 		
 		def checkAndMerge
 		checkAndMerge = { source, target->
