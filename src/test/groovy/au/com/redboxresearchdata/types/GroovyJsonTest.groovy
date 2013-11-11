@@ -49,7 +49,7 @@ public class GroovyJsonTest extends GroovyTestCase {
 
 	@Test
 	public void testSlurpAndAddDefaultToMultipleRecords() {
-		String source = getTestString()
+		String source = getTestString2()
 		JSONAware sourceBody = HarvestUtilities.slurpBody(source)
 
 		String template = getDefault()
@@ -81,10 +81,10 @@ public class GroovyJsonTest extends GroovyTestCase {
         "attachmentList" : ["tfpackage", "workflow.metadata"],
         "customProperties" : ["file.path"],
         "varMap" : {
-            "file.path" : "${fascinator.home}/packages/<oid>.tfpackage"            
+            "file.path" : "fasinator_home/packages/<oid>.tfpackage"            
         },
         "attachmentDestination" : {
-            "tfpackage":["<oid>.tfpackage","metadata.json","$file.path"], 
+            "tfpackage":["<oid>.tfpackage","metadata.json","file_path"], 
             "workflow.metadata":["workflow.metadata"]
         },
         "workflow.metadata" : {
@@ -143,6 +143,43 @@ public class GroovyJsonTest extends GroovyTestCase {
                 "xmlns:anzsrc"
             ]
           }
+        }
+      ]   
+   }
+}"""
+		return test;
+	}
+
+	private String getTestString2() {
+		String test = """{
+ "data": {
+    "data": [
+        {
+        "datasetId":"1",
+        "owner":"admin",
+        "attachmentList" : ["tfpackage", "workflow.metadata"],
+        "attachmentDestination" : {
+            "tfpackage":["<oid>.tfpackage","metadata.json"], 
+            "workflow.metadata":["workflow.metadata"]
+        },
+        "workflow.metadata" : {
+            "id":"dataset",
+            "formData" : {
+                "title" : "Test-Record-JSON Harvester",
+            }                    
+        },
+        "tfpackage": {                      
+            "title": "Test-Record-JSON Harvester",
+            "redbox:submissionProcess.dc:date": "",
+            "metaList": [
+                "dc:title",
+                "xmlns:anzsrc"
+            ]
+          }
+        }, 
+		{
+          "datasetId":"3",
+          "owner":"Invalid JSON Document"                              
         }
       ]   
    }

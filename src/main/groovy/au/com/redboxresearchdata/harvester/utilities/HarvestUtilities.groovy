@@ -33,8 +33,8 @@ public class HarvestUtilities {
 	}
 
 	private static def stepIntoJsonArray(JSONArray source, JSONArray target, sourceElement, i, Expando expando) {
-		if (i < target.size()) {
-			expando.parentFunction(sourceElement, target[i], expando)
+		if (i < target.size() && (sourceElement instanceof JSONAware)) {
+			expando.parentFunction(sourceElement, target.get(i), expando)
 		} else {
 			expando.altFunction
 		}
@@ -60,7 +60,7 @@ public class HarvestUtilities {
 			} else if (source instanceof JSONObject && target instanceof JSONObject) {
 				expando.altFunction = {putInTarget}
 				stepIntoJsonObject(source, target, sourceElement, expando)
-			} else showError(ITERATE_ERROR)
+			} else {showError(ITERATE_ERROR)}
 		}
 	}
 
@@ -88,7 +88,7 @@ public class HarvestUtilities {
 			} else if (source instanceof JSONObject && target instanceof JSONObject) {
 				expando.altFunction = {showError(MAP_ERROR)}
 				stepIntoJsonObject(source, target, sourceElement, expando)
-			} else showError(ITERATE_ERROR)
+			} else {showError(ITERATE_ERROR)}
 		}
 		return expando.completed
 	}
