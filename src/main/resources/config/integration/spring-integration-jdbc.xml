@@ -19,9 +19,9 @@ Configuration file for harvesting from a DB table using  JDBC.
 To execute, specify "jdbc" in the parameter and set the required system configuration.
  -->
 	
-	<int-jdbc:inbound-channel-adapter query="${harvest.jdbc.service.query}"
-    channel="servicesIn" data-source="dataSource"
-    update="${harvest.jdbc.service.update}" />
+	<int-jdbc:inbound-channel-adapter query="${harvest.jdbc.Dataset.query}"
+    channel="datasetIn" data-source="dataSource" select-sql-parameter-source="datasetConfigSqlParamSource"     
+     />
     
     <poller default="true" max-messages-per-poll="${harvest.queueCapacity}" receive-timeout="${harvest.pollTimeout}"
 		fixed-delay="${harvest.pollRate}"
@@ -29,14 +29,14 @@ To execute, specify "jdbc" in the parameter and set the required system configur
 		<transactional isolation="SERIALIZABLE" />
 	</poller>
 	
-	<int:header-enricher input-channel="servicesIn" output-channel="jdbcIn">
-	    <int:header name="type" value="Service"/>	     
+	<int:header-enricher input-channel="datasetIn" output-channel="jdbcIn">
+	    <int:header name="type" value="Dataset"/>	     
 	</int:header-enricher>
 		
 	<int:transformer id="jdbcToJson" input-channel="jdbcIn"
 		output-channel="jdbcHarvestChannel" ref="transformationHandler" method="handleJdbc" />
 		
-	 <int-jms:outbound-channel-adapter id="jmsOut" destination="requestQueue" channel="jdbcHarvestChannel"/> 
+	<int-jms:outbound-channel-adapter id="jmsOut" destination="requestQueue" channel="jdbcHarvestChannel"/> 
 	
 	<int:channel id="jdbcHarvestChannel">
 		<int:interceptors>
@@ -76,4 +76,8 @@ To execute, specify "jdbc" in the parameter and set the required system configur
     <bean id="requestQueue" class="org.apache.activemq.command.ActiveMQQueue">
 		<constructor-arg value="jsonHarvester"/>
 	</bean>
+	<bean id="datasetConfigSqlParamSource" class="au.com.redboxresearchdata.jdbc.ConfigSqlParameterSource" >
+		<property name="config" value="#{placeholderProperties.config}" />
+		<property name="type" value="Dataset" />
+	</bean> 	
 </beans>

@@ -17,10 +17,13 @@
  ******************************************************************************/
 package au.com.redboxresearchdata.harvester.json.client;
 
+import groovy.util.ConfigObject;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 
 import org.apache.log4j.Logger;
@@ -94,10 +97,11 @@ public final class Main {
 					  + "\n=========================================================" );
 		}
 
+		ConfigObject config = Config.getConfig(environment, configFilePath);
+		Map configMap = config.flatten();
 		System.setProperty("environment", environment);
-		System.setProperty("harvester.client.config.file", configFilePath);
+		System.setProperty("harvester.client.config.file", (String) configMap.get("file.runtimePath"));
 		
-		Config.getConfig(environment, configFilePath);
 		
 		String absContextPath = "config/integration/" + contextFilePath;
 		File contextFile = new File(absContextPath);
