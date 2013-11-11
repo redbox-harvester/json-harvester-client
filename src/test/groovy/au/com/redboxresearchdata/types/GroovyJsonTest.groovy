@@ -18,9 +18,8 @@ public class GroovyJsonTest extends GroovyTestCase {
 
         JSONParser p = new JSONParser();
         JSONObject firstJ = (JSONObject) p.parse(first);
-        JSONObject secondJ = (JSONObject) p.parse(second);
 
-        JSONObject completed = HarvestUtilities.deeperMerge(firstJ, secondJ)
+        JSONObject completed = HarvestUtilities.deeperMerge(firstJ, second)
 
         System.out.println(completed.toJSONString())
         System.out.println()
@@ -52,11 +51,7 @@ public class GroovyJsonTest extends GroovyTestCase {
         String source = getTestString2()
         JSONAware sourceBody = HarvestUtilities.slurpBody(source)
 
-        String template = getDefault()
-        JSONParser parser = new JSONParser()
-        JSONObject templateJson = (JSONObject) parser.parse(template);
-
-        JSONAware completed = HarvestUtilities.addDefaultToMultiple(sourceBody, templateJson)
+        JSONAware completed = HarvestUtilities.addDefaultToMultiple(sourceBody, getDefault())
 
         System.out.print(completed.toJSONString())
         System.out.println()
@@ -76,23 +71,13 @@ public class GroovyJsonTest extends GroovyTestCase {
 
     private String getDefault() {
         String testExtra = """{
-        "owner":"admin",
-        "attachmentList" : ["tfpackage", "workflow.metadata"],
-        "customProperties" : ["file.path"],
-        "varMap" : {
-            "file.path" : "fasinator_home/packages/<oid>.tfpackage"            
-        },
-        "attachmentDestination" : {
-            "tfpackage":["<oid>.tfpackage","metadata.json","file_path"], 
-            "workflow.metadata":["workflow.metadata"]
-        },
         "workflow.metadata" : {
-            "id":"",
+            "id":"test",
             "step":"metadata-review",
             "pageTitle":"Metadata Record",
             "label":"Metadata Review",
             "formData" : {
-                "title" : "",
+                "title" : "test",
                 "description": "Test description"
             }                    
         }

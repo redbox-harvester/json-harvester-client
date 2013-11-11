@@ -74,9 +74,11 @@ public class HarvestUtilities {
 	 * @param tgt  the target of the merge. New data will be added. Pre-existing data will be clobbered
 	 * @return merged target
 	 */
-	static JSONObject deeperMerge(final JSONObject src, final JSONObject tgt) {
+	static JSONObject deeperMerge(final JSONObject src, final String tgt) {
 		def expando = new Expando()
-		JSONObject target = checkAndMerge(src, tgt, expando)
+		JSONParser parser = new JSONParser()
+		JSONObject initial = parser.parse(tgt)
+		JSONObject target = checkAndMerge(src, initial, expando)
         return target
 	}
 
@@ -97,7 +99,7 @@ public class HarvestUtilities {
 		return expando.completed
 	}
 
-	static JSONObject unpackCollection(JSONObject source, JSONObject envelope) {
+	static JSONObject unpackCollection(final JSONObject source, final JSONObject envelope) {
 		def expando = new Expando()
 		JSONObject result = checkAndUnpack(envelope, source, expando)
 		return result
@@ -120,10 +122,10 @@ public class HarvestUtilities {
 		return sourceJson
 	}
 
-	static def addDefaultToMultiple(JSONAware source, JSONObject target) {
+	static def addDefaultToMultiple(final JSONAware source, final String target) {
 		JSONArray resultCollection = new JSONArray()
 		source.each{ element->
-			def result = deeperMerge(element, target)
+			JSONObject result = deeperMerge(element, target)
 			resultCollection.add(result)
 		}
 		return resultCollection
