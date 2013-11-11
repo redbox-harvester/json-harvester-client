@@ -11,72 +11,71 @@ import au.com.redboxresearchdata.harvester.utilities.HarvestUtilities
 
 public class GroovyJsonTest extends GroovyTestCase {
 
-	@Test
-	public void testDeepMerge() {
-		String second = getExtraString()
-		String first = getTestString()
+    @Test
+    public void testDeepMerge() {
+        String second = getExtraString()
+        String first = getTestString()
 
-		JSONParser p = new JSONParser();
-		JSONObject firstJ = (JSONObject)p.parse(first);
-		JSONObject secondJ = (JSONObject)p.parse(second);
+        JSONParser p = new JSONParser();
+        JSONObject firstJ = (JSONObject) p.parse(first);
+        JSONObject secondJ = (JSONObject) p.parse(second);
 
-		JSONObject completed = HarvestUtilities.deeperMerge(firstJ, secondJ)
+        JSONObject completed = HarvestUtilities.deeperMerge(firstJ, secondJ)
 
-		System.out.println(completed.toJSONString())
-		System.out.println()
-	}
+        System.out.println(completed.toJSONString())
+        System.out.println()
+    }
 
-	@Test
-	public void testStartingPoint() {
-		String first = getTestString()
-		String second = getUnpackageString()
-		JSONParser p = new JSONParser()
-		JSONObject firstJ = (JSONObject)p.parse(first);
-		JSONObject secondJ = (JSONObject)p.parse(second);
+    @Test
+    public void testStartingPoint() {
+        String first = getTestString()
+        String second = getUnpackageString()
+        JSONParser p = new JSONParser()
+        JSONObject firstJ = (JSONObject) p.parse(first);
+        JSONObject secondJ = (JSONObject) p.parse(second);
 
-		JSONObject completed = HarvestUtilities.unpackCollection(firstJ, secondJ)
-		System.out.println(completed.toJSONString())
-		System.out.println()
-	}
+        JSONObject completed = HarvestUtilities.unpackCollection(firstJ, secondJ)
+        System.out.println(completed.toJSONString())
+        System.out.println()
+    }
 
-	@Test
-	public void testSlurpBody() {
-		String source = getTestString()
-		JSONAware completed = HarvestUtilities.slurpBody(source)
-		System.out.print(completed.toJSONString())
-		System.out.println()
-	}
+    @Test
+    public void testSlurpBody() {
+        String source = getTestString()
+        JSONAware completed = HarvestUtilities.slurpBody(source)
+        System.out.print(completed.toJSONString())
+        System.out.println()
+    }
 
-	@Test
-	public void testSlurpAndAddDefaultToMultipleRecords() {
-		String source = getTestString2()
-		JSONAware sourceBody = HarvestUtilities.slurpBody(source)
+    @Test
+    public void testSlurpAndAddDefaultToMultipleRecords() {
+        String source = getTestString2()
+        JSONAware sourceBody = HarvestUtilities.slurpBody(source)
 
-		String template = getDefault()
-		JSONParser parser = new JSONParser()
-		JSONObject templateJson = (JSONObject)parser.parse(template);
+        String template = getDefault()
+        JSONParser parser = new JSONParser()
+        JSONObject templateJson = (JSONObject) parser.parse(template);
 
-		JSONAware completed = HarvestUtilities.addDefaultToMultiple(sourceBody, templateJson)
+        JSONAware completed = HarvestUtilities.addDefaultToMultiple(sourceBody, templateJson)
 
-		System.out.print(completed.toJSONString())
-		System.out.println()
-	}
+        System.out.print(completed.toJSONString())
+        System.out.println()
+    }
 
 
 
-	private String getUnpackageString() {
-		String testExtra = """{
+    private String getUnpackageString() {
+        String testExtra = """{
  "data": {
     "data": [
       ]   
    }
 }"""
-	}
+    }
 
 
-	private String getDefault() {
-		String testExtra = """{
-        "datasetId":"1",
+    private String getDefault() {
+        String testExtra = """{
         "owner":"admin",
         "attachmentList" : ["tfpackage", "workflow.metadata"],
         "customProperties" : ["file.path"],
@@ -88,22 +87,21 @@ public class GroovyJsonTest extends GroovyTestCase {
             "workflow.metadata":["workflow.metadata"]
         },
         "workflow.metadata" : {
-            "id":"dataset",
+            "id":"",
             "step":"metadata-review",
             "pageTitle":"Metadata Record",
             "label":"Metadata Review",
             "formData" : {
-                "title" : "Test-Record-JSON Harvester",
+                "title" : "",
                 "description": "Test description"
             }                    
-        },
-        "tfpackage": {} 
+        }
 }"""
-		return testExtra;
-	}
+        return testExtra;
+    }
 
-	private String getExtraString() {
-		String testExtra = """{
+    private String getExtraString() {
+        String testExtra = """{
  "type":"DatasetJson",
  "data": {
     "data": [
@@ -114,11 +112,11 @@ public class GroovyJsonTest extends GroovyTestCase {
       ]   
    }
 }"""
-		return testExtra;
-	}
+        return testExtra;
+    }
 
-	private String getTestString() {
-		String test = """{
+    private String getTestString() {
+        String test = """{
  "data": {
     "data": [
         {
@@ -130,9 +128,9 @@ public class GroovyJsonTest extends GroovyTestCase {
             "workflow.metadata":["workflow.metadata"]
         },
         "workflow.metadata" : {
-            "id":"dataset",
+            "id":"",
             "formData" : {
-                "title" : "Test-Record-JSON Harvester",
+                "title" : ""
             }                    
         },
         "tfpackage": {                      
@@ -147,43 +145,28 @@ public class GroovyJsonTest extends GroovyTestCase {
       ]   
    }
 }"""
-		return test;
-	}
+        return test;
+    }
 
-	private String getTestString2() {
-		String test = """{
+    private String getTestString2() {
+        String test = """{
  "data": {
     "data": [
         {
-        "datasetId":"1",
-        "owner":"admin",
-        "attachmentList" : ["tfpackage", "workflow.metadata"],
-        "attachmentDestination" : {
-            "tfpackage":["<oid>.tfpackage","metadata.json"], 
-            "workflow.metadata":["workflow.metadata"]
+            "workflow.metadata" : {
+                "id":"dataset",
+                 "formData" : {
+                    "title" : "Test-Record-JSON Harvester"
+                 }
+            }
         },
-        "workflow.metadata" : {
-            "id":"dataset",
-            "formData" : {
-                "title" : "Test-Record-JSON Harvester",
-            }                    
-        },
-        "tfpackage": {                      
-            "title": "Test-Record-JSON Harvester",
-            "redbox:submissionProcess.dc:date": "",
-            "metaList": [
-                "dc:title",
-                "xmlns:anzsrc"
-            ]
-          }
-        }, 
 		{
-          "datasetId":"3",
-          "owner":"Invalid JSON Document"                              
+            "datasetId":"3",
+            "owner":"Invalid JSON Document"
         }
-      ]   
-   }
+    ]
+ }
 }"""
-		return test;
-	}
+        return test;
+    }
 }

@@ -1,6 +1,5 @@
 package au.com.redboxresearchdata.harvester.utilities
 
-import groovy.json.JsonException
 import groovy.json.JsonOutput
 import groovy.json.JsonSlurper
 
@@ -24,19 +23,19 @@ public class HarvestUtilities {
 		throw new UnsupportedOperationException(message)
 	}
 
-	private static def addToTarget = { JSONArray target, sourceElement->
+	private static def addToTarget = { target, sourceElement->
 		target.add(sourceElement)
 	}
 
-	private static def putInTarget = {JSONObject target, sourceKey, sourceValue->
-		target.put(sourceKey, sourceValue);
+	private static def putInTarget = {target, sourceKey, sourceValue->
+		target.put(sourceKey, sourceValue)
 	}
 
 	private static def stepIntoJsonArray(JSONArray source, JSONArray target, sourceElement, i, Expando expando) {
 		if (i < target.size() && (sourceElement instanceof JSONAware)) {
 			expando.parentFunction(sourceElement, target.get(i), expando)
 		} else {
-			expando.altFunction
+			expando.altFunction(target, sourceElement)
 		}
 	}
 
@@ -47,7 +46,7 @@ public class HarvestUtilities {
 		if ( target.containsKey(sourceKey) && (sourceValue instanceof JSONAware)) {
 			expando.parentFunction(sourceValue, target[sourceKey], expando)
 		} else {
-			expando.altFunction
+			expando.altFunction(target, sourceKey, sourceValue)
 		}
 	}
 
@@ -55,13 +54,16 @@ public class HarvestUtilities {
 		expando.parentFunction = checkAndMerge
 		source.eachWithIndex{ sourceElement, i ->
 			if (source instanceof JSONArray && target instanceof JSONArray) {
-				expando.altFunction = {addToTarget}
+				expando.altFunction = addToTarget
 				stepIntoJsonArray(source, target, sourceElement, i, expando)
 			} else if (source instanceof JSONObject && target instanceof JSONObject) {
-				expando.altFunction = {putInTarget}
+				expando.altFunction = putInTarget
 				stepIntoJsonObject(source, target, sourceElement, expando)
-			} else {showError(ITERATE_ERROR)}
+			} else {
+				showError(ITERATE_ERROR)
+			}
 		}
+        return target
 	}
 
 	/**
@@ -71,11 +73,11 @@ public class HarvestUtilities {
 	 * @param src the json object used to get new data
 	 * @param tgt  the target of the merge. New data will be added. Pre-existing data will be clobbered
 	 * @return merged target
-	 * @throws JsonException
 	 */
 	static JSONObject deeperMerge(final JSONObject src, final JSONObject tgt) {
 		def expando = new Expando()
 		JSONObject target = checkAndMerge(src, tgt, expando)
+        return target
 	}
 
 	private static def checkAndUnpack={ source, target, Expando expando ->
@@ -88,7 +90,9 @@ public class HarvestUtilities {
 			} else if (source instanceof JSONObject && target instanceof JSONObject) {
 				expando.altFunction = {showError(MAP_ERROR)}
 				stepIntoJsonObject(source, target, sourceElement, expando)
-			} else {showError(ITERATE_ERROR)}
+			} else {
+				showError(ITERATE_ERROR)
+			}
 		}
 		return expando.completed
 	}
