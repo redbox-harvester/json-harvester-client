@@ -5,9 +5,9 @@ import org.codehaus.groovy.runtime.typehandling.DefaultTypeTransformation
 
 
 public class SyncIterator implements Iterator, Iterable{
-	private theobjects
+	private final theobjects
 
-	public SyncIterator(Object[] objects){
+	SyncIterator(Object[] objects){
 		theobjects=objects.collect{
 			if (it instanceof Iterator) return /*from closure*/ it
 			else return /*from closure*/ DefaultTypeTransformation.asCollection(it).iterator()
@@ -17,7 +17,8 @@ public class SyncIterator implements Iterator, Iterable{
 	boolean hasNext(){
 		return theobjects.any{it.hasNext()}
 	}
-	public Object next(){
+	
+	Object next(){
 		if (!hasNext()) throw new java.util.NoSuchElementException()
 		return theobjects.collect{
 			try{
@@ -28,12 +29,12 @@ public class SyncIterator implements Iterator, Iterable{
 		}
 	}
 
-	public Iterator iterator(){
+	Iterator iterator(){
 		return this;
 	}
 
 
-	public void remove(){
+	void remove(){
 		throw new UnsupportedOperationException("remove() not supported")
 	}
 }
