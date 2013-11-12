@@ -38,35 +38,15 @@ class JsonTemplateService {
 	private static final Logger log = Logger.getLogger(JsonTemplateService.class);
 	ConfigObject config;
 
-	/**
-	 * Default file handler: loads the contents of the file as message payload.
-	 * 
-	 * Sets the filename, file size, file extension, filename without extension as headers.
-	 * It also sets the FileHeaders.ORIGINAL_FILE File reference.
-	 * 
-	 * @param inputMessage
-	 * @return
-	 */
+
 	@ServiceActivator
 	public Message<String> addDefaultValues(final Message<String> inputMessage) {
 		String inputString = inputMessage.getPayload();
-		String jsonTemplate = """{
-"type":"DatasetJson",
- "data": {
-    "data": [
-		{
-        "datasetId":"",
-		"owner":""
-		}
-      ]   
-   }
-}"""
-		JSONParser parser = new JSONParser()
-		JSONObject source = parser.parse(inputString)
-		JSONObject target = parser.parse(jsonTemplate)
-		
-		JSONObject result = HarvestUtilities.deeperMerge(source, target)
-		
+
+		JSONObject body = HarvestUtilities.slurpBody(inputString)
+		String template = config.defaultTemplate
+		JSONObject result = HarvestUtilities.addDefaultToMultiple(body, template)
+
 		final Message<String> message = MessageBuilder.withPayload(result.toJSONString()).build()
 		return message;
 	}

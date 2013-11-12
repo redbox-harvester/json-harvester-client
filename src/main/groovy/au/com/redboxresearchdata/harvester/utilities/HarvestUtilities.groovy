@@ -105,6 +105,17 @@ public class HarvestUtilities {
 		return result
 	}
 
+	
+	//TODO : remove dependence on hard-coding of "data.data"
+	/**
+	 * (Alternative to slurper is to use method unpackCollection)
+	 * @param source full text including envelope and body.
+	 * TODO : At the moment this method and the alternative can find a point within text to start at for adding defaults
+	 * with deeperMerge. However finding the starting point is not enough. It needs to remove and remember this envelope to
+	 * be able to re-add it around the updated body text at the end of deeperMerge. Currently this method does not take into
+	 * account the added field type: JsonService, either
+	 * @return
+	 */
 	static def slurpBody(String source) {
 		def sourceSlurper = new JsonSlurper().parseText(source)
 		def sourceBody = sourceSlurper.data.data

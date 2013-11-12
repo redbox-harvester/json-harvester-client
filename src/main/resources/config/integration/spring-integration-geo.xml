@@ -32,8 +32,10 @@ To execute, specify "jdbc" in the parameter and set the required system configur
 	    <int:header name="type" value="Service"/>	     
 	</int:header-enricher>
 		
-	<int:transformer id="jdbcToJson" input-channel="jdbcIn"
-		output-channel="jdbcHarvestChannel" ref="transformationHandler" method="handleJdbc" />
+	<int:chain input-channel="jdbcIn" output-channel="jdbcHarvestChannel" >
+		<int:transformer  ref="transformationHandler" method="handleJdbc"  />
+		<int:service-activator ref="serviceHandler" method="addDefaultValues"/>
+	</int:chain>
 		
 	 <int-jms:outbound-channel-adapter id="jmsOut" destination="requestQueue" channel="jdbcHarvestChannel"/> 
 	
@@ -51,6 +53,10 @@ To execute, specify "jdbc" in the parameter and set the required system configur
 		<property name="config" value="#{placeholderProperties.config}" />
 	</bean>
 		
+	<bean id="serviceHandler"
+		class="au.com.redboxresearchdata.harvester.json.service.JsonTemplateService" >
+		<property name="config" value="#{placeholderProperties.config}" />
+	</bean>
 		
 	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
 		<property name="driverClassName" value="${harvest.jdbc.driver}" />

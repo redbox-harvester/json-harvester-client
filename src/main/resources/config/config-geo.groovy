@@ -28,6 +28,14 @@ environments {
 			queueCapacity = "1"
 			pollTimeout = "5000"
 		}
+		defaultTemplate {
+			workflow.metadata  {
+	            id = "test"
+	            step = "metadata-review"
+	            pageTitle = "Metadata Record"
+	            label = "Metadata Review"                 
+			}
+		}
 		activemq {
 			url = "tcp://118.138.242.150:9101"
 		}
@@ -60,6 +68,14 @@ environments {
 			pollRate = "5000"
 			queueCapacity = "1"
 			pollTimeout = "5000"
+		}
+		defaultTemplate {
+			workflow.metadata  {
+				id = "test"
+				step = "metadata-review"
+				pageTitle = "Metadata Record"
+				label = "Metadata Review"
+			}
 		}
 		activemq {
 			url = "tcp://118.138.242.150:9101"
