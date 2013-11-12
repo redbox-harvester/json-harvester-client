@@ -20,7 +20,9 @@ environments {
 				url = "jdbc:postgresql://localhost:2001/aodn_portal"			
 				service {
 					query = "SELECT dataset_name, description, collection_period_from, collection_period_to FROM metadata"
-				}			
+				}
+				user="geodb"
+				pw="geodb"		
 			}
 			pollRate = "5000"
 			queueCapacity = "1"
@@ -51,7 +53,9 @@ environments {
 				url = "jdbc:postgresql://localhost:2001/aodn_portal"			
 				service {
 					query = "SELECT dataset_name, description, collection_period_from, collection_period_to FROM metadata"
-				}			
+				}		
+				user="geodb"
+				pw="geodb"
 			}
 			pollRate = "5000"
 			queueCapacity = "1"
