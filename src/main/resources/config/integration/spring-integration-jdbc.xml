@@ -20,8 +20,7 @@ To execute, specify "jdbc" in the parameter and set the required system configur
  -->
 	
 	<int-jdbc:inbound-channel-adapter query="${harvest.jdbc.service.query}"
-    channel="servicesIn" data-source="dataSource"
-    update="${harvest.jdbc.service.update}" />
+    channel="servicesIn" data-source="dataSource" />
     
     <poller default="true" max-messages-per-poll="${harvest.queueCapacity}" receive-timeout="${harvest.pollTimeout}"
 		fixed-delay="${harvest.pollRate}"

@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:int="http://www.springframework.org/schema/integration"
+    xmlns:int-file="http://www.springframework.org/schema/integration/file"
+    xmlns:int-jms="http://www.springframework.org/schema/integration/jms"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans
+            http://www.springframework.org/schema/beans/spring-beans.xsd
+            http://www.springframework.org/schema/integration
+            http://www.springframework.org/schema/integration/spring-integration.xsd
+            http://www.springframework.org/schema/integration/file
+            http://www.springframework.org/schema/integration/file/spring-integration-file.xsd
+            http://www.springframework.org/schema/integration/jms
+            http://www.springframework.org/schema/integration/jms/spring-integration-jms.xsd" >
+<!-- 
+Configuration file for harvesting JSON files on the "./input" directory. 
+
+The files contents are sent verbatim across the wire. 
+
+To execute, specify "file" in the parameter, and drop a copy of "TestService.json" or "TestServices.json" 
+in the "input" directory.
+
+ -->	
+	<!-- See also: http://static.springsource.org/spring-integration/reference/htmlsingle/#channel-adapter
+		http://www.eaipatterns.com/ChannelAdapter.html -->
+		
+	<int-file:inbound-channel-adapter id="filesIn" directory="${harvest.directory}" filename-pattern="*.json">
+		<int:poller id="poller" fixed-rate="${harvest.pollRate}" max-messages-per-poll="${harvest.queueCapacity}" />
+	</int-file:inbound-channel-adapter>
+
+	<!-- See also: http://static.springsource.org/spring-integration/reference/htmlsingle/#transformer
+		http://www.eaipatterns.com/MessageTranslator.html --> 
+	<!-- <int:transformer id="copyFiles" input-channel="filesIn"
+		output-channel="harvestChannel" ref="transformationHandler" method="handleFile" />
+ -->
+	<int:chain input-channel="filesIn" output-channel="harvestChannel" >
+		<int:transformer ref="transformationHandler" method="handleFile" />
+		<int:service-activator ref="templateService" method="addDefaultValues"/>
+	</int:chain>
+	
+	 <int-jms:outbound-channel-adapter id="jmsOut" destination="requestQueue" channel="harvestChannel"/> 
+	
+	<!-- See also: http://static.springsource.org/spring-integration/reference/htmlsingle/#channel
+		http://www.eaipatterns.com/MessageChannel.html-->
+	<int:channel id="routingChannel" >
+		<int:interceptors>
+			<int:wire-tap channel="loggingChannel" />
+		</int:interceptors>
+	</int:channel>
+	
+	<int:channel id="harvestChannel">
+		<int:interceptors>
+			<int:wire-tap channel="routingChannel" />
+		</int:interceptors>
+	</int:channel> 
+
+	<!-- See also: http://static.springsource.org/spring-integration/reference/htmlsingle/#router
+		http://www.eaipatterns.com/MessageRouter.html -->
+	<int:header-value-router id="fileTypeRouter"
+		header-name="file_extension" input-channel="routingChannel"
+		resolution-required="false" default-output-channel="otherFilesOut">
+		<int:mapping value="json" channel="jsonFilesOut" />
+	</int:header-value-router>
+
+	<!-- See also: http://static.springsource.org/spring-integration/reference/htmlsingle/#channel-adapter
+		http://www.eaipatterns.com/ChannelAdapter.html -->
+	<int-file:outbound-channel-adapter
+		id="jsonFilesOut" directory="${harvest.output.json.directory}"
+		delete-source-files="${harvest.output.json.deletesource}" />
+	<int-file:outbound-channel-adapter
+		id="otherFilesOut" directory="${harvest.output.other.directory}"
+		delete-source-files="${harvest.output.other.deletesource}" />
+
+	<int:logging-channel-adapter id="loggingChannel"
+		expression="'Processing file: ' + headers.file_name + ' (' + headers.file_size + ' bytes) '" />
+
+	<bean id="transformationHandler"
+		class="au.com.redboxresearchdata.harvester.json.transformer.JsonTransformationHandler" />
+		
+	<bean id="templateService"
+		class="au.com.redboxresearchdata.harvester.json.service.JsonTemplateService" />
+		
+	<bean id="placeholderProperties" class="au.com.redboxresearchdata.util.config.ConfigSlurperPlaceholderConfigurer">
+		<property name="environment" value="#{systemProperties['environment']}"/>
+		<property name="defaultEnvironment" value="production" />
+		<property name="location" value="#{systemProperties['harvester.client.config.file']}" />
+	</bean>
+
+	<bean id="connectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
+        <property name="brokerURL" value="${activemq.url}" />
+    </bean>
+    <bean id="requestQueue" class="org.apache.activemq.command.ActiveMQQueue">
+		<constructor-arg value="jsonHarvester"/>
+	</bean>	
+</beans>

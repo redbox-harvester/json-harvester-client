@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:int="http://www.springframework.org/schema/integration"
+    xmlns:int-jms="http://www.springframework.org/schema/integration/jms"
+    xmlns:int-jdbc="http://www.springframework.org/schema/integration/jdbc" 
+    xmlns:int-file="http://www.springframework.org/schema/integration/file"  
+    xmlns:jdbc="http://www.springframework.org/schema/jdbc"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans
+            http://www.springframework.org/schema/beans/spring-beans.xsd
+            http://www.springframework.org/schema/integration
+            http://www.springframework.org/schema/integration/spring-integration.xsd
+            http://www.springframework.org/schema/integration/file
+            http://www.springframework.org/schema/integration/file/spring-integration-file.xsd
+            http://www.springframework.org/schema/integration/jms
+            http://www.springframework.org/schema/integration/jms/spring-integration-jms.xsd 
+            http://www.springframework.org/schema/integration/jdbc 
+            http://www.springframework.org/schema/integration/jdbc/spring-integration-jdbc.xsd">
+
+<!--  
+Configuration file for harvesting CSV files on a directory specified by system property "csvjdbc.source"
+
+To test, ensure the CSV files are in the harvest directory then execute the Main class with "csvjdbc" in the parameter and set the required system properties. 
+
+Required system properties:
+
+csvjdbc.source - Specified the harvest directory of csv files
+
+ -->	
+	<!--  File-related configuration -->
+	<int-file:inbound-channel-adapter id="channel_filesIn" directory="${harvest.directory}" filename-pattern="*.csv">
+		<int:poller id="poller" fixed-rate="${harvest.pollRate}" max-messages-per-poll="${harvest.queueCapacity}" />
+	</int-file:inbound-channel-adapter>
+	
+	<!--  JDBC configuration -->
+	<int-jdbc:inbound-channel-adapter query="SELECT * FROM table" channel="channel_tablesIn" data-source="dataSource" >
+    	<int:poller trigger="csvjdbcBridge"/>
+    </int-jdbc:inbound-channel-adapter>
+    
+    <!--  General configuration  -->
+	<int:chain input-channel="channel_filesIn" output-channel="channel_tablesIn" >
+		<int:transformer  ref="transformationHandler" method="handleFileHeaders" />
+		<int:service-activator ref="csvjdbcBridge" method="addTable"/>
+	</int:chain>
+	
+	<int:chain input-channel="channel_tablesIn" output-channel="channel_requestHarvest">
+		<int:header-enricher>
+			<int:header name="type" method="getTable" ref="csvjdbcBridge" />
+			<int:header name="original_file" method="getOriginalFile" ref="csvjdbcBridge" />
+			<int:header name="is_valid" value="true"/>
+		</int:header-enricher>
+		<int:service-activator ref="csvjdbcBridge" method="moveSourceFile"/>
+		<!-- 
+		<int:splitter ref="recSplitter" method="doNothing" />
+		<int:header-value-router header-name="is_valid" default-output-channel="channel_notifyInvalid">
+			<int:mapping value="true" channel="channel_requestHarvest" />
+		</int:header-value-router> -->
+	</int:chain>
+	
+	<!-- 
+	<int:header-value-router id="validityRouter" header-name="is_valid" input-channel="channel_router"
+		resolution-required="false" default-output-channel="channel_notifyInvalid">
+		
+	</int:header-value-router> -->
+	
+	<int:chain input-channel="channel_requestHarvest">
+		<int:transformer ref="transformationHandler" method="handleCsvJdbc" />
+	</int:chain>     
+	
+	<int:channel id="channel_requestHarvest">
+		<int:interceptors>
+			<!--  <int:wire-tap channel="channel_logging" /> --> 
+			<ref bean="shutdowner"/>											
+		</int:interceptors>
+	</int:channel> 
+	
+	 <int-file:outbound-channel-adapter id="channel_notifyInvalid"
+    directory="output/"/>
+	
+	<int-jms:outbound-channel-adapter id="jmsHarvestOut" destination="harvestQueue" channel="channel_requestHarvest"/>
+
+	<!--  <int:logging-channel-adapter id="channel_logging" expression="'Processing record of type:' + headers.type" /> -->
+    
+	<!--  Bean configuration -->
+
+	<bean id="transformationHandler" class="au.com.redboxresearchdata.harvester.json.transformer.JsonTransformationHandler">
+		<property name="config" value="#{placeholderProperties.config}" />
+	</bean>
+			
+	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+		<property name="driverClassName" value="${harvest.csvjdbc.className}" />
+		<property name="url" value="${harvest.csvjdbc.url}" />
+	</bean>
+	
+	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+	
+	<bean id="csvjdbcBridge" class="au.com.redboxresearchdata.harvester.csvjdbc.CsvJdbcBridge">
+		<constructor-arg value="${harvest.queueCapacity}"/>
+		<property name="channelInterceptor" ref="shutdowner"/>
+		<property name="config" value="#{placeholderProperties.config}" />
+	</bean>
+	
+	<bean id="recSplitter" class="au.com.redboxresearchdata.util.splitter.RecordSplitter">
+	</bean>
+	
+	<bean id="shutdowner" class="au.com.redboxresearchdata.util.integration.interceptor.TransmissionInterceptorAdapter">
+		<property name="shouldCountPresending" value="false" />
+	</bean>
+	
+	<bean id="placeholderProperties" class="au.com.redboxresearchdata.util.config.ConfigSlurperPlaceholderConfigurer">
+		<property name="environment" value="#{systemProperties['environment']}"/>
+		<property name="defaultEnvironment" value="production" />
+		<property name="location" value="#{systemProperties['harvester.client.config.file']}" />
+	</bean>			
+	
+ 	<!--  Destination  -->
+	<bean id="connectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
+        <property name="brokerURL" value="${activemq.url}" />
+    </bean>
+    <bean id="harvestQueue" class="org.apache.activemq.command.ActiveMQQueue">
+		<constructor-arg value="jsonHarvester"/>
+	</bean>
+</beans>
