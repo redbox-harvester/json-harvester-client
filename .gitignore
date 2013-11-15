@@ -2,3 +2,5 @@
 /src/test/resources/config/generated
 /target
 /.settings
+.classpath
+.project

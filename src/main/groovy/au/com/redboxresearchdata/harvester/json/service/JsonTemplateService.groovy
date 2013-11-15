@@ -43,11 +43,13 @@ class JsonTemplateService {
 	public Message<String> addDefaultValues(final Message<String> inputMessage) {
 		String inputString = inputMessage.getPayload();
 
-		JSONObject body = HarvestUtilities.slurpBody(inputString)
-		String template = config.defaultTemplate
-		JSONObject result = HarvestUtilities.addDefaultToMultiple(body, template)
+		def defaultTemplate = config.defaultTemplate
+		JSONObject jsonDefaults = new JSONObject(defaultTemplate)
+		String type = config.defaultType
 
-		final Message<String> message = MessageBuilder.withPayload(result.toJSONString()).build()
+		String result = HarvestUtilities.addDefaultToWrappedRecords(inputString, jsonDefaults.toString(), type)
+
+		final Message<String> message = MessageBuilder.withPayload(result).build()
 		return message;
 	}
 }

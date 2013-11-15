@@ -9,6 +9,8 @@ import org.json.simple.JSONAware
 import org.json.simple.JSONObject
 import org.json.simple.parser.JSONParser
 
+import au.com.redboxresearchdata.types.TypeFactory
+
 public class HarvestUtilities {
 	private static final Logger log = Logger.getLogger(HarvestUtilities.class);
 	private static final String ARRAY_ERROR = "The size of the envelope must be smaller than the source"
@@ -63,7 +65,7 @@ public class HarvestUtilities {
 				showError(ITERATE_ERROR)
 			}
 		}
-        return target
+		return target
 	}
 
 	/**
@@ -76,36 +78,48 @@ public class HarvestUtilities {
 	 */
 	static JSONObject deeperMerge(final JSONObject src, final String tgt) {
 		def expando = new Expando()
+		JSONObject jsonTemplate = createJsonObject(tgt)
+		JSONObject target = checkAndMerge(src, jsonTemplate, expando)
+		return target
+	}
+
+	private static def createJsonObject(String target) {
 		JSONParser parser = new JSONParser()
-		JSONObject initial = parser.parse(tgt)
-		JSONObject target = checkAndMerge(src, initial, expando)
-        return target
+		JSONObject json = parser.parse(target)
+		return json
 	}
 
-	private static def checkAndUnpack={ source, target, Expando expando ->
-		expando.completed = target
-		expando.parentFunction = checkAndUnpack
-		source.eachWithIndex{ sourceElement, i->
-			if (source instanceof JSONArray && target instanceof JSONArray) {
-				expando.altFunction = {showError(ARRAY_ERROR)}
-				stepIntoJsonArray(source, target, sourceElement, i, expando)
-			} else if (source instanceof JSONObject && target instanceof JSONObject) {
-				expando.altFunction = {showError(MAP_ERROR)}
-				stepIntoJsonObject(source, target, sourceElement, expando)
-			} else {
-				showError(ITERATE_ERROR)
-			}
-		}
-		return expando.completed
-	}
+	//	private static def checkAndUnpack={ source, target, Expando expando ->
+	//		expando.completed = target
+	//		expando.parentFunction = checkAndUnpack
+	//		source.eachWithIndex{ sourceElement, i->
+	//			if (source instanceof JSONArray && target instanceof JSONArray) {
+	//				expando.altFunction = {showError(ARRAY_ERROR)}
+	//				stepIntoJsonArray(source, target, sourceElement, i, expando)
+	//			} else if (source instanceof JSONObject && target instanceof JSONObject) {
+	//				expando.altFunction = {showError(MAP_ERROR)}
+	//				stepIntoJsonObject(source, target, sourceElement, expando)
+	//			} else {
+	//				showError(ITERATE_ERROR)
+	//			}
+	//		}
+	//		return expando.completed
+	//	}
+	//
+	//	/**
+	//	 * Uses the sourceEnvelope to find the inner json element/object that the envelope contains.
+	//	 * @param source: source record(s) with envelope
+	//	 * @param envelope: the envelope to remove from source(s)
+	//	 * @return: inner json object
+	//	 */
+	//	static JSONObject unpackCollection(final JSONObject source, final String envelope) {
+	//		def expando = new Expando()
+	//		JSONObject jsonEnvelope = createJsonObject(envelope)
+	//		JSONObject result = checkAndUnpack(jsonEnvelope, source, expando)
+	//		return result
+	//	}
 
-	static JSONObject unpackCollection(final JSONObject source, final JSONObject envelope) {
-		def expando = new Expando()
-		JSONObject result = checkAndUnpack(envelope, source, expando)
-		return result
-	}
 
-	
 	//TODO : remove dependence on hard-coding of "data.data"
 	/**
 	 * (Alternative to slurper is to use method unpackCollection)
@@ -133,6 +147,23 @@ public class HarvestUtilities {
 		return sourceJson
 	}
 
+	static JSONObject addEnvelope(JSONAware source, String type) {
+		String prefix = TypeFactory.getJsonHeaderStr(type)
+		String suffix = TypeFactory.getJsonFooterStr(type)
+		StringBuilder enveloped = new StringBuilder(source.toString())
+				.insert(0, prefix)
+				.append(suffix)
+
+		JSONObject jsonEnveloped = createJsonObject(enveloped.toString())
+		return jsonEnveloped
+	}
+
+	/**
+	 * Calls deeperMerge for multiple json records, applying to jsonTemplate.
+	 * @param source: source json object containing multiple json records
+	 * @param target: target json template containing default values and/or required properties
+	 * @return
+	 */
 	static def addDefaultToMultiple(final JSONAware source, final String target) {
 		JSONArray resultCollection = new JSONArray()
 		source.each{ element->
@@ -140,5 +171,23 @@ public class HarvestUtilities {
 			resultCollection.add(result)
 		}
 		return resultCollection
+	}
+
+	/**
+	 * convenience method to remove header, footer applied by TypeFactory, apply defaults, and then re-apply header and footer.
+	 * 
+	 * @param wrappedSource: source with header and footer
+	 * @param targetDefaults: default properties that will be applied for each record
+	 * @param type: type as defined in TypeFactory
+	 * @return wrapped records with defaults applied.
+	 */
+	static String addDefaultToWrappedRecords(final String wrappedSource, final String targetDefaults, final String type) {
+		JSONAware unwrapped = slurpBody(wrappedSource)
+
+		JSONAware completed = HarvestUtilities.addDefaultToMultiple(unwrapped, targetDefaults)
+
+		JSONObject rewrapped = HarvestUtilities.addEnvelope(completed, type)
+		
+		return rewrapped.toString()
 	}
 }

@@ -11,16 +11,14 @@
 environments {
 	development {
 		file {
-			runtimePath = "src/test/resources/config/generated/config-geo.groovy"
-			customPath = "src/test/resources/config/config-geo.groovy"
+			runtimePath = "config/generated/config-geo.groovy"
+			customPath = "config/config-geo.groovy"
 		}
 		harvest {
 			jdbc {
 				driver = "org.postgresql.Driver"
 				url = "jdbc:postgresql://localhost:2001/aodn_portal"
-				service {
-					query = "SELECT dataset_name, description, collection_period_from, collection_period_to FROM metadata"
-				}
+				service { query = "SELECT dataset_name, description, collection_period_from, collection_period_to FROM metadata" }
 				user="geodb"
 				pw="geodb"
 			}
@@ -29,16 +27,17 @@ environments {
 			pollTimeout = "5000"
 		}
 		defaultTemplate {
-			workflow.metadata  {
-	            id = "test"
-	            step = "metadata-review"
-	            pageTitle = "Metadata Record"
-	            label = "Metadata Review"                 
+			workflow {
+				metadata { 
+					id = "test"
+					step = "metadata-review"
+					pageTitle = "Metadata Record"
+					label = "Metadata Review"
+				}
 			}
 		}
-		activemq {
-			url = "tcp://118.138.242.150:9101"
-		}
+		defaultType = "Service"
+		activemq { url = "tcp://localhost:9000" }
 		types  {
 			Service  {
 				fields = [
@@ -59,9 +58,7 @@ environments {
 			jdbc {
 				driver = "org.postgresql.Driver"
 				url = "jdbc:postgresql://localhost:2001/aodn_portal"
-				service {
-					query = "SELECT dataset_name, description, collection_period_from, collection_period_to FROM metadata"
-				}
+				service { query = "SELECT dataset_name, description, collection_period_from, collection_period_to FROM metadata" }
 				user="geodb"
 				pw="geodb"
 			}
@@ -77,9 +74,7 @@ environments {
 				label = "Metadata Review"
 			}
 		}
-		activemq {
-			url = "tcp://118.138.242.150:9101"
-		}
+		activemq { url = "tcp://118.138.242.150:9101" }
 		types  {
 			Service  {
 				fields = [
