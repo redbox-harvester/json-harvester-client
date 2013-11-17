@@ -62,8 +62,6 @@ public class BasicHttpClient {
             baseUrl = baseUrl.substring(0, baseUrl.length() - 1);
         }
   //      log.info(baseUrl + "----------------------------baseUrl");
-        System.out.println(baseUrl
-                + "----------------baseUrl-------------------");
         this.username = username;
         this.password = password;
         this.baseUrl = baseUrl;
