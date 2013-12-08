@@ -32,7 +32,7 @@ import org.springframework.integration.annotation.Transformer
 import org.springframework.integration.file.FileHeaders
 import org.springframework.integration.support.MessageBuilder
 
-import au.com.redboxresearchdata.types.TypeFactory
+import au.com.redboxresearchdata.json.JsonFactory
 
 /*
  * Spring Integration Transformation Handler
@@ -119,7 +119,7 @@ class JsonTransformationHandler {
 	 */
 	@Transformer
 	public Message<String> handleJdbc(@Payload List<Map> payload, @Header("type") String type) {		
-		String data = TypeFactory.buildJsonStr(payload, type, config)
+		String data = JsonFactory.buildJsonStr(payload, type, config)
 		if (log.isDebugEnabled()) {
 			log.debug("JSON message payload: ${data}")
 		}
@@ -142,7 +142,7 @@ class JsonTransformationHandler {
 	 */
 	@Transformer
 	public Message<String> handleCsvJdbc(@Payload List<Map> payload, @Header("type") String type, @Header("original_file") origFile) {
-		String data = TypeFactory.buildJsonStr(payload, type, config)
+		String data = JsonFactory.buildJsonStr(payload, type, config)
 		if (log.isDebugEnabled()) {
 			log.debug("JSON message payload: ${data}")
 		}
@@ -157,7 +157,7 @@ class JsonTransformationHandler {
 	
 	@Transformer
 	public Message<String> handleRecord(@Payload Map payload, @Header("type") String type) {
-		String data = TypeFactory.buildJsonStr(payload, type, config)
+		String data = JsonFactory.buildJsonStr(payload, type, config)
 		if (log.isDebugEnabled()) {
 			log.debug("JSON message payload: ${data}")
 		}

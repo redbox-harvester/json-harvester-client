@@ -11,8 +11,8 @@
 environments {
 	development {
 		file {
-			runtimePath = "src/test/resources/config/generated/config-file.groovy"
-			customPath = "src/test/resources/config/config-file.groovy"
+			runtimePath = "config/generated/config-file.groovy"
+			customPath = "config/config-file.groovy"
 		}
 		harvest {
 			directory = "input"
@@ -21,7 +21,7 @@ environments {
 			output {
 				json {
 					directory = "target/output/json"
-					deletesource = "true"
+					deletesource = "false"
 				}
 				other {
 					directory = "target/output/other"

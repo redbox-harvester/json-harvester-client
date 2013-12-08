@@ -216,15 +216,7 @@
 			<groupId>org.apache.activemq</groupId>
 			<artifactId>activemq-core</artifactId>
 			<version>${activemq.version}</version>
-		</dependency>
-		
-		<!--  Data Types -->
-		<dependency>
-			<groupId>au.com.redboxresearchdata</groupId>
-  			<artifactId>types</artifactId>
-  			<version>${types.version}</version>
-			<scope>compile</scope>  			
-		</dependency>
+		</dependency>			
 		
 		<!--  Custom utils -->
 		<dependency>

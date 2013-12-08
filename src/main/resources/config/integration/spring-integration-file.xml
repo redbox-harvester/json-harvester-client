@@ -74,7 +74,7 @@ in the "input" directory.
 		
 	<bean id="placeholderProperties" class="au.com.redboxresearchdata.util.config.ConfigSlurperPlaceholderConfigurer">
 		<property name="environment" value="#{systemProperties['environment']}"/>
-		<property name="defaultEnvironment" value="production" />
+		<property name="defaultEnvironment" value="development" />
 		<property name="location" value="#{systemProperties['harvester.client.config.file']}" />
 	</bean>
 
