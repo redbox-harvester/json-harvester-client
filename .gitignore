@@ -1,4 +1,5 @@
 /output
-/src/test/resources/config/generated
+/src/test/resources/config/java
+/src/test/resources/config/groovy
 /target
 /.settings

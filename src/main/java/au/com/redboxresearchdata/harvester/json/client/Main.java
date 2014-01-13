@@ -20,9 +20,6 @@ package au.com.redboxresearchdata.harvester.json.client;
 import groovy.util.ConfigObject;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 
@@ -37,18 +34,22 @@ import au.com.redboxresearchdata.util.config.Config;
 /**
  * Starts the Spring Context and will initialize the Spring Integration routes. 
  * 
- * The class expects a single command line argument: the client type. It also expects an system property: "environment", that is used in the environment-aware configuration.
+ * The class expects a single command line argument: the configuration file path. 
  * 
- * This class attempts to load the default config file from the current working directory: "config/config-<client type command line argument>.groovy".
- * Failing this, it will finally load the same default config file path from the classpath .
+ * It also expects the ff. system properties: 
  * 
- * The client type argument controls which integration routes are loaded, located at "config/integration/spring-integration-<client type>.xml". 
- * The relative path is initially loaded from the current working directory. Failing this, it will load it from the classpath.
+ * "environment" - string qualifier used in the environment-aware configuration.
+ * "run.mode" - See description below.
  * 
- * The client type argument also dictates how this class behaves:
+ * This class attempts to load the default config file specified at the command path. It initially expects this file to be present on the file system. Failing this, it will attempt to load the same default config file path from the classpath .
  * 
- * "file", "jdbc" - interactive mode, will continue to poll until "q" is pressed.
- * "csvjdbc" - will process all valid files in the "{harvest.directory}" and then exit.
+ * The configuration value at "client.siPath" specifies the Spring Integration Application Context File. This file may exist in the file system, if not, it will attempt to load the file from the classpath. 
+ * 
+ * The run mode dictates how the client behaves:
+ * 
+ * "daemon" - interactive mode, will continue to poll until "q" is pressed. 
+ * 
+ * Otherwise, the client will continue to run while the Spring application context is running or while the main thread isn't interrupted while sleeping.
  *
  * @author Shilo Banihit
  * @since 1.0
@@ -61,10 +62,7 @@ public final class Main {
 
 	private Main() { }
 
-	private static void displayOptions() {
-		//TODO: determine list of options
-//		LOGGER.info("Please select an option: " + clientTypes.toString());
-	}
+	
 	/**
 	 * Load the Spring Integration Application Context. 
 	 *
@@ -73,14 +71,11 @@ public final class Main {
 	public static void main(final String... args) {
 		
 		if (args.length <= 0) {
-			LOGGER.error("No client type!");
-			displayOptions();
+			LOGGER.error("Configuration path not provided!");
 			return;
 		}
-		String clientType = args[0];
-		
-		String contextFilePath = "spring-integration-"+clientType+".xml";
-		String configFilePath = "config/config-" +clientType+".groovy";
+		String configFilePath = args[0];
+				
 		String environment = System.getProperty("environment");
 		String runMode = System.getProperty("run.mode");
 		
@@ -89,8 +84,6 @@ public final class Main {
 					  + "\n                                                         "
 					  + "\n     Welcome to ReDBox / Mint JSON Harvester Client      "
 					  + "\n                                                         "
-					  + "\n     You have selected: "+ clientType 
-					  + "\n     Using context configuration file: " + contextFilePath
 					  + "\n     Using default configuration file: " + configFilePath
 					  + "\n     Using environment: " + environment
 					  + "\n                                                         "
@@ -102,26 +95,32 @@ public final class Main {
 		System.setProperty("environment", environment);
 		System.setProperty("harvester.client.config.file", (String) configMap.get("file.runtimePath"));
 		
+		String contextFilePath = (String) configMap.get("client.siPath");
+		// check if the harvester has a name
+		String harvesterId = (String) configMap.get("client.harvesterId");
+		if (harvesterId == null || harvesterId.length() == 0) {
+			LOGGER.error("Invalid harvester configuration, no value specified at 'client.harvesterId'");
+			return;
+		}
 		
-		String absContextPath = "config/integration/" + contextFilePath;
+		String absContextPath = contextFilePath;
 		File contextFile = new File(absContextPath);
 		final AbstractApplicationContext context;
 		if (!contextFile.exists()) {
 			absContextPath = "classpath:"+absContextPath;
+			LOGGER.info("Using contextPath:" + absContextPath);
 			context =
 					new ClassPathXmlApplicationContext(absContextPath);
 		} else {
-			absContextPath = "file:" + absContextPath; 
+			absContextPath = "file:" + absContextPath;
+			LOGGER.info("Using contextPath:" + absContextPath);
 			context =
 					new FileSystemXmlApplicationContext(absContextPath);
 		}
 		
-
+		
+		
 		context.registerShutdownHook();
-
-		if (clientType.equals("file")|| clientType.equals("riffile")) {
-			SpringIntegrationUtils.displayDirectories(context);
-		}
 		
 		if ("daemon".equals(runMode)) {
 			final Scanner scanner = new Scanner(System.in);

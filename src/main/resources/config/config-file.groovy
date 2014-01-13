@@ -10,9 +10,13 @@
 // Environment specific config below...
 environments {
 	development {
+		client {
+			harvesterId = "JsonFileHarvester"
+			siPath = "config/integration/spring-integration-file.xml"
+		}
 		file {
-			runtimePath = "config/generated/config-file.groovy"
-			customPath = "config/config-file.groovy"
+			runtimePath = "config/runtime/config-file.groovy"
+			customPath = "config/custom/config-file.groovy"
 		}
 		harvest {
 			directory = "input"
