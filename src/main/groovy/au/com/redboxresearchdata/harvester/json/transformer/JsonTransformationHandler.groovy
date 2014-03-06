@@ -34,11 +34,11 @@ import org.springframework.integration.support.MessageBuilder
 
 import au.com.redboxresearchdata.json.JsonFactory
 
-/*
- * Spring Integration Transformation Handler
+/**
  * 
- * @author Shilo Banihit
- * @since 1.0
+ * Transformer for creating JSON strings using the JsonFactory class.
+ * 
+ * @author <a href="https://github.com/shilob">Shilo Banihit</a>
  *
  */
 class JsonTransformationHandler {
@@ -109,7 +109,7 @@ class JsonTransformationHandler {
 	}
 		
 	/**
-	 * Used to transform a JDBC result set to a JSON harvest request message. 
+	 * Used to transform a List of Maps or a JDBC-like result set to a JSON harvest request message. 
 	 * 
 	 * Requires a "type" header that specifies the data type of the result set.
 	 *  
