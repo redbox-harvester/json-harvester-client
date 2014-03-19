@@ -1,12 +1,13 @@
 environments {
 	test {
 		velocityTransformer {
-			templateDir = "src/test/resources/templates"
+			templateDir = "src/test/resources/templates/"
+			scriptDir = "src/test/resources/scripts/"
 			testData {				
 				templates = ["unit-test-template1.vm","unit-test-template2.vm"]
 				scripts {
-					preVelocity = [["src/test/resources/scripts/preExec-velocityTransformer.groovy":""]]
-					postVelocity = [["src/test/resources/scripts/postExec-velocityTransformer.groovy":""]]
+					preVelocity = [["preExec-velocityTransformer.groovy":""]]
+					postVelocity = [["postExec-velocityTransformer.groovy":""]]
 				}
 			}
 		}

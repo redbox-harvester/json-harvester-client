@@ -35,7 +35,7 @@ import org.apache.velocity.runtime.RuntimeConstants
 
 import au.com.redboxresearchdata.util.script.ScriptExecutor;
 /**
- * Transformer for transforming JSON string messages using Velocity templates.
+ * Transforms JSON string messages using Velocity templates.
  * 
  * Please set the 'config' property, with the ConfigObject instance containing the 'velocityTransformer.templateDir' and 'velocityTransformer.<type>.templates' array property.
  * 
@@ -69,12 +69,20 @@ class JsonVelocityTransformer {
 		def dataMap = new JsonSlurper().parseText(dataStr)
 		
 		// run the pre execution scripts, passing in the dataMap, no validation is expected so checkData is false
-		def scriptingReturnValue = ScriptExecutor.launchScripts(config.velocityTransformer[type]?.scripts?.preVelocity, false, dataMap, type, config)
+		def scriptDir = config.velocityTransformer?.scriptDir ? config.velocityTransformer?.scriptDir : ""
+		// we don't want nasty suprises in the config, so we convert everything "-" to "_"
+		def safeTypeName = type.replace("-", "_")
+		def typeConfig = config.velocityTransformer[safeTypeName]
+		if (!typeConfig) {
+			logger.warn("Velocity Transformer Type configuration does not exist: ${safeTypeName}")
+		}
+		logger.debug("Using script directory: '${scriptDir}'")
+		def scriptingReturnValue = ScriptExecutor.launchScripts(scriptDir, typeConfig?.scripts?.preVelocity, false, dataMap, type, config)
 		dataMap = scriptingReturnValue.data
 		data = new JsonBuilder(dataMap).toString()
 		vc.put("data", dataMap)
 		
-		config.velocityTransformer[type]?.templates?.each { templatePath->
+		typeConfig?.templates?.each { templatePath->
 			Template template = ve.getTemplate(templatePath)
 			
 			if (template) {				
@@ -95,7 +103,7 @@ class JsonVelocityTransformer {
 			}
 		}
 		// run the post execution scripts, instead of the JSONish structure, we pass in the message builder, so scripts can manipulate the message as they wish.
-		scriptingReturnValue = ScriptExecutor.launchScripts(config.velocityTransformer[type]?.scripts?.postVelocity, false, builder, type, config)
+		scriptingReturnValue = ScriptExecutor.launchScripts(scriptDir, typeConfig?.scripts?.postVelocity, false, builder, type, config)
 		builder = scriptingReturnValue.data
 		
 		final Message<String> message = builder.build()				
