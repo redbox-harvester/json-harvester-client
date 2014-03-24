@@ -32,6 +32,7 @@ import org.apache.velocity.VelocityContext
 import org.apache.velocity.app.Velocity
 import org.apache.velocity.app.VelocityEngine
 import org.apache.velocity.runtime.RuntimeConstants
+import org.apache.velocity.runtime.log.NullLogChute
 
 import au.com.redboxresearchdata.util.script.ScriptExecutor;
 /**
@@ -53,12 +54,12 @@ class JsonVelocityTransformer {
 		ve = new VelocityEngine()
 		logger.debug("Template dir:${config.velocityTransformer.templateDir}")
 		ve.setProperty(RuntimeConstants.FILE_RESOURCE_LOADER_PATH, config.velocityTransformer.templateDir)
+		ve.setProperty(Velocity.RUNTIME_LOG_LOGSYSTEM_CLASS, NullLogChute.class.getName())
 		try {
 			logger.debug("Initializing VelocityEngine...")
 			ve.init()
 		} catch (Exception e) {
 			logger.error("Error initializing VelocityEngine: ${e}")
-			e.printStackTrace()			
 		}
 	}
 	
