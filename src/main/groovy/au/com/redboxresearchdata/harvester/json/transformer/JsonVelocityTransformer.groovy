@@ -53,7 +53,12 @@ class JsonVelocityTransformer {
 		ve = new VelocityEngine()
 		logger.debug("Template dir:${config.velocityTransformer.templateDir}")
 		ve.setProperty(RuntimeConstants.FILE_RESOURCE_LOADER_PATH, config.velocityTransformer.templateDir)
-		ve.init()
+		try {
+			ve.init()
+		} catch (e) {
+			logger.error("Error initializing VelocityEngine: {}", e)
+			e.printStackTrace()			
+		}
 	}
 	
 	@Transformer
@@ -63,6 +68,7 @@ class JsonVelocityTransformer {
 		if (!ve) {
 			initVelocity()
 		}
+		logger.debug("Creating VelocityContext...")
 		VelocityContext vc = new VelocityContext()
 		vc.put("origData", dataStr)
 		logger.debug("origData set to: ${dataStr}")		
