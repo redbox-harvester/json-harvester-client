@@ -38,9 +38,13 @@ environments {
 		}
 	}
 	production {
+		client {
+			harvesterId = "JsonFileHarvester"
+			siPath = "config/integration/spring-integration-file.xml"
+		}
 		file {
-			runtimePath = "config/generated/config-file.groovy"
-			customPath = "config/config-custom-file.groovy"
+			runtimePath = "config/runtime/config-file.groovy"
+			customPath = "config/custom/config-file.groovy"
 		}
 		harvest {
 			directory = "input"
@@ -48,11 +52,11 @@ environments {
 			queueCapacity = "10"
 			output {
 				json {
-					directory = "output/json"
-					deletesource = "true"
+					directory = "target/output/json"
+					deletesource = "false"
 				}
 				other {
-					directory = "output/other"
+					directory = "target/output/other"
 					deletesource = "true"
 				}
 			}
