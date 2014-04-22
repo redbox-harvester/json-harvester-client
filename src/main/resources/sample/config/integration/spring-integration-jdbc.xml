@@ -13,12 +13,7 @@
             http://www.springframework.org/schema/integration/jms/spring-integration-jms.xsd 
             http://www.springframework.org/schema/integration/jdbc 
             http://www.springframework.org/schema/integration/jdbc/spring-integration-jdbc.xsd">
-<!-- 
-Configuration file for harvesting from a DB table using  JDBC.
 
-To execute, specify "jdbc" in the parameter and set the required system configuration.
- -->
-	
 	<int-jdbc:inbound-channel-adapter query="${harvest.jdbc.Dataset.query}"
     channel="datasetIn" data-source="dataSource" select-sql-parameter-source="datasetConfigSqlParamSource"     
      />

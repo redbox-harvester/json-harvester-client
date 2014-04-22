@@ -1,47 +1,28 @@
 /**
  * JDBC Harvest Configuration File
  * ----------------------------------------------------------------------
- * PROJECT: JSON File Harvester Client
- * ----------------------------------------------------------------------
  *
- * @author Shilo Banihit
+ * This sample configuration transforms and sends data from a MySQL database to a JMS Queue in JSON format.
+ * 
+ * It executes the query specified on the "harvest.jdbc.[Data Type Name]" entry below. The data type configured for this example is "Dataset", and is found on the Spring Integration XML file.
+ * For each of the record returned, the data is transformed into JSON. Prior to creating the JSON, the scripts specified at "harvest.scripts.preAssemble" are executed. 
+ * After the JSON message is constructed, the scripts specified at "harvest.scripts.postBuild" are executed.
+ * 
+ * After all the records had been transformed into JSON, the data is sent to the JMS queue "jsonHarvester" on the server and port configured below. The queue name is specified at the Spring Integration XML file.
+ * 
+ * 
+ * @author <a href="https://github.com/shilob">Shilo Banihit</a>
  *
  */
-Service {
-	fields = [
-		["ID" : "ID"],
-		["Name" : "name"],
-		["Type" : "type"],
-		["ANZSRC_FOR_1" : "ANZSRC_FOR_1"],
-		["ANZSRC_FOR_2" : "ANZSRC_FOR_2"],
-		["ANZSRC_FOR_3" : "ANZSRC_FOR_3"],
-		["Location" : "Location"],
-		["Coverage_Temporal_From" : "Coverage_Temporal_From"],
-		["Coverage_Temporal_To" : "Coverage_Temporal_To"],
-		["Coverage_Spatial_Type" : "Coverage_Spatial_Type"],
-		["Coverage_Spatial_Value" : "Coverage_Spatial_Value"],
-		["Existence_Start" : "Existence_Start"],
-		["Existence_End" : "Existence_End"],
-		["Website" : "Website"],
-		["Data_Quality_Information" : "Data_Quality_Information"],
-		["Reuse_Information" : "Reuse_Information"],
-		["Access_Policy" : "Access_Policy"],
-		["Description" : "Description"],
-		["URI" : "URI"]
-	]
-	required = ["ID"]
-}
-Dataset {
-	fields = [
-		["id" : "datasetId"]
-	]
-}
-// Environment specific config below...
 environments {
 	development {
+		client {
+			harvesterId = "JdbcHarvester"
+			siPath = "sample/config/integration/spring-integration-jdbc.xml"
+		}
 		file {
-			runtimePath = "config/generated/config-jdbc.groovy"
-			customPath = "config/config-jdbc.groovy"
+			runtimePath = "sample/config/generated/config-jdbc.groovy"
+			customPath = "sample/config/config-jdbc.groovy"
 		}
 		harvest {
 			jdbc {
@@ -69,9 +50,13 @@ environments {
 		}
 	}
 	production {
+		client {
+			harvesterId = "JdbcHarvester"
+			siPath = "sample/config/integration/spring-integration-jdbc.xml"
+		}
 		file {
-			runtimePath = "config/generated/config-jdbc.groovy"
-			customPath = "config/config-jdbc.groovy"
+			runtimePath = "sample/config/generated/config-jdbc.groovy"
+			customPath = "sample/config/config-jdbc.groovy"
 		}
 		harvest {
 			jdbc {

@@ -16,17 +16,7 @@
             http://www.springframework.org/schema/integration/jms/spring-integration-jms.xsd 
             http://www.springframework.org/schema/integration/jdbc 
             http://www.springframework.org/schema/integration/jdbc/spring-integration-jdbc.xsd">
-
-<!--  
-Configuration file for harvesting CSV files on a directory specified by system property "csvjdbc.source"
-
-To test, ensure the CSV files are in the harvest directory then execute the Main class with "csvjdbc" in the parameter and set the required system properties. 
-
-Required system properties:
-
-csvjdbc.source - Specified the harvest directory of csv files
-
- -->	
+	
 	<!--  File-related configuration -->
 	<int-file:inbound-channel-adapter id="channel_filesIn" directory="${harvest.directory}" filename-pattern="*.csv">
 		<int:poller id="poller" fixed-rate="${harvest.pollRate}" max-messages-per-poll="${harvest.queueCapacity}" />
@@ -49,19 +39,8 @@ csvjdbc.source - Specified the harvest directory of csv files
 			<int:header name="original_file" method="getOriginalFile" ref="csvjdbcBridge" />
 			<int:header name="is_valid" value="true"/>
 		</int:header-enricher>
-		<int:service-activator ref="csvjdbcBridge" method="moveSourceFile"/>
-		<!-- 
-		<int:splitter ref="recSplitter" method="doNothing" />
-		<int:header-value-router header-name="is_valid" default-output-channel="channel_notifyInvalid">
-			<int:mapping value="true" channel="channel_requestHarvest" />
-		</int:header-value-router> -->
-	</int:chain>
-	
-	<!-- 
-	<int:header-value-router id="validityRouter" header-name="is_valid" input-channel="channel_router"
-		resolution-required="false" default-output-channel="channel_notifyInvalid">
-		
-	</int:header-value-router> -->
+		<int:service-activator ref="csvjdbcBridge" method="moveSourceFile"/>	
+	</int:chain>	
 	
 	<int:chain input-channel="channel_requestHarvest">
 		<int:transformer ref="transformationHandler" method="handleCsvJdbc" />

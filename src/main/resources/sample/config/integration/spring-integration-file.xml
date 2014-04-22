@@ -12,17 +12,6 @@
             http://www.springframework.org/schema/integration/file/spring-integration-file.xsd
             http://www.springframework.org/schema/integration/jms
             http://www.springframework.org/schema/integration/jms/spring-integration-jms.xsd" >
-<!-- 
-Configuration file for harvesting JSON files on the "./input" directory. 
-
-The files contents are sent verbatim across the wire. 
-
-To execute, specify "file" in the parameter, and drop a copy of "TestService.json" or "TestServices.json" 
-in the "input" directory.
-
- -->	
-	<!-- See also: http://static.springsource.org/spring-integration/reference/htmlsingle/#channel-adapter
-		http://www.eaipatterns.com/ChannelAdapter.html -->
 		
 	<int-file:inbound-channel-adapter id="filesIn" directory="${harvest.directory}" filename-pattern="*.json">
 		<int:poller id="poller" fixed-rate="${harvest.pollRate}" max-messages-per-poll="${harvest.queueCapacity}" />

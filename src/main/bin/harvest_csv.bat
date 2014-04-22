@@ -1,1 +1,1 @@
-java -Denvironment=production -Dlog4j.configuration=prod-log4j.xml -jar json-harvester-client.jar config/config-csvjdbc.groovy
+java -Denvironment=production -Dlog4j.configuration=prod-log4j.xml -jar json-harvester-client.jar sample/config/config-csvjdbc.groovy
