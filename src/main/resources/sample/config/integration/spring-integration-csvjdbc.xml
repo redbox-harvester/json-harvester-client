@@ -32,7 +32,7 @@
 		<int:transformer  ref="transformationHandler" method="handleFileHeaders" />
 		<int:service-activator ref="csvjdbcBridge" method="addTable"/>
 	</int:chain>
-	
+	<!--  Add the headers back again after the JDBC poll so we can move the source files  -->
 	<int:chain input-channel="channel_tablesIn" output-channel="channel_requestHarvest">
 		<int:header-enricher>
 			<int:header name="type" method="getTable" ref="csvjdbcBridge" />

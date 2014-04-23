@@ -1,5 +1,8 @@
 {
- "type":"DatasetJson", 
+ "type":"DatasetJson",
+ "harvesterId":"SampleJsonFileFromBaseImplementation",
+ "hostName":"localhost",
+ "hostIp":"127.0.0.1",  
  "data": {
     "data": [
         {
