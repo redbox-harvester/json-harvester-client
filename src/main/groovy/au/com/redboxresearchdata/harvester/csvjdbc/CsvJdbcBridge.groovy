@@ -18,14 +18,10 @@
 package au.com.redboxresearchdata.harvester.csvjdbc
 
 import au.com.redboxresearchdata.util.integration.interceptor.TransmissionInterceptorAdapter
-import java.io.File
-import java.io.Reader
+
 import java.sql.Connection
-import java.util.Date
 import java.sql.SQLException
 import java.sql.Statement
-import java.util.HashMap
-import java.util.List
 import java.util.concurrent.ArrayBlockingQueue
 
 import org.apache.log4j.Logger;
@@ -35,8 +31,8 @@ import org.springframework.integration.annotation.Payload
 import org.springframework.scheduling.Trigger
 import org.springframework.scheduling.TriggerContext
 import org.springframework.integration.Message
-import org.springframework.integration.support.MessageBuilder
-import org.springframework.jdbc.core.namedparam.AbstractSqlParameterSource;
+import org.apache.commons.lang.StringUtils
+
 /**
  * Bridges Spring Integration's file and JDBC mechanisms for CSVJDBC's file-specific awareness.
  * 
@@ -137,6 +133,50 @@ class CsvJdbcBridge implements TableReader, Trigger {
 		}
 		return message
 	}
+
+    /**
+     * Moves/renames the source file, under 'harvestType' sub-folder, and returns the original message.
+     *
+     * Can be used by service activators in a chain.
+     *
+     * @param message
+     * @param originalFile
+     * @param harvestType - used for destination sub-folder
+     * @param table  - used as destination file name
+     * @return message
+     */
+    public Message<?> moveSourceFileUsingHarvestType(Message<?> message, @Header("original_file")File originalFile, @Header("harvestType") harvestType, @Header("type") table) {
+        if (originalFile == null) {
+            log.error("Tried to move source file with no valid file reference.")
+            return
+        }
+
+        File destinationParent = createParentDirectory(config.harvest.output.directory + harvestType)
+
+        String destinationChild = table + "_" + new Date().format(config.harvest.output.dateFormat) + ".csv"
+        File destinationFile = new File(destinationParent, destinationChild)
+
+        if (originalFile.renameTo(destinationFile)) {
+            if (log.isDebugEnabled()) {
+                log.debug("File '${originalFile}' renamed to '${destinationFile}'")
+            }
+        } else {
+            log.error("Failed to rename '${originalFile}' to '${destinationParent}/${destinationChild}'")
+        }
+        return message
+    }
+
+    private File createParentDirectory(String directoryName) {
+        File directory = new File(directoryName)
+        // do not create non-existent parent directories
+        directory.mkdir()
+        if (log.isDebugEnabled()) {
+            log.debug("directory created: '${directory}'.")
+        } else {
+            log.error("unable to create directory: '${directoryName}'.")
+        }
+        return directory
+    }
 	
 	/**
 	 * Method called by CSVJDBC driver when executing a SQL statement.

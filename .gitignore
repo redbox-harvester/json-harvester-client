@@ -3,3 +3,6 @@
 /src/test/resources/config/groovy
 /target
 /.settings
+.classpath
+.project
+.pydevproject
