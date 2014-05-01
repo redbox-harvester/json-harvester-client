@@ -56,7 +56,7 @@ class JsonTransformationHandler {
 	 * @return SI Message with String payload.
 	 */
 	@Transformer
-	public Message<String> handleFile(final Message<File> inputMessage) {
+	Message<String> handleFile(final Message<File> inputMessage) {
 
 		final File inputFile = inputMessage.getPayload()
 		final String filename = inputFile.getName()
@@ -90,7 +90,7 @@ class JsonTransformationHandler {
 	 * @return
 	 */
 	@Transformer
-	public Message<File> handleFileHeaders(final Message<File> inputMessage) {
+	Message<File> handleFileHeaders(final Message<File> inputMessage) {
 		final File inputFile = inputMessage.getPayload()
 		final String filename = inputFile.getName()
 		final String filenameWithoutExt = FilenameUtils.removeExtension(filename)
@@ -118,7 +118,7 @@ class JsonTransformationHandler {
 	 * @return JSON harvest request message.
 	 */
 	@Transformer
-	public Message<String> handleJdbc(@Payload List<Map> payload, @Header("type") String type) {		
+	Message<String> handleJdbc(@Payload List<Map> payload, @Header("type") String type) {
 		String data = JsonFactory.buildJsonStr(payload, type, config)
 		if (log.isDebugEnabled()) {
 			log.debug("JSON message payload: ${data}")
@@ -141,7 +141,7 @@ class JsonTransformationHandler {
 	 * @return  JSON harvest request message.
 	 */
 	@Transformer
-	public Message<String> handleCsvJdbc(@Payload List<Map> payload, @Header("type") String type, @Header("original_file") origFile) {
+	Message<String> handleCsvJdbc(@Payload List<Map> payload, @Header("type") String type, @Header("original_file") origFile) {
 		String data = JsonFactory.buildJsonStr(payload, type, config)
 		if (log.isDebugEnabled()) {
 			log.debug("JSON message payload: ${data}")
@@ -167,7 +167,7 @@ class JsonTransformationHandler {
      * @return  JSON harvest request message.
      */
     @Transformer
-    public Message<String> handleCsvJdbcUsingHarvestType(@Payload List<Map> payload, @Header("type") String type, @Header("original_file") origFile, @Header("harvestType") harvestType) {
+    Message<String> handleCsvJdbcUsingHarvestType(@Payload List<Map> payload, @Header("type") String type, @Header("original_file") origFile, @Header("harvestType") harvestType) {
         String data = JsonFactory.buildJsonStr(payload, type, config, harvestType)
         if (log.isDebugEnabled()) {
             log.debug("JSON message payload: ${data}")
@@ -182,7 +182,7 @@ class JsonTransformationHandler {
     }
 	
 	@Transformer
-	public Message<String> handleRecord(@Payload Map payload, @Header("type") String type) {
+	Message<String> handleRecord(@Payload Map payload, @Header("type") String type) {
 		String data = JsonFactory.buildJsonStr(payload, type, config)
 		if (log.isDebugEnabled()) {
 			log.debug("JSON message payload: ${data}")

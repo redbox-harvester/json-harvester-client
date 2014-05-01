@@ -31,7 +31,6 @@ import org.springframework.integration.annotation.Payload
 import org.springframework.scheduling.Trigger
 import org.springframework.scheduling.TriggerContext
 import org.springframework.integration.Message
-import org.apache.commons.lang.StringUtils
 
 /**
  * Bridges Spring Integration's file and JDBC mechanisms for CSVJDBC's file-specific awareness.
@@ -66,7 +65,7 @@ class CsvJdbcBridge implements TableReader, Trigger {
 	 * 
 	 * @param queueCapacity
 	 */
-	public CsvJdbcBridge(String queueCapacity) {
+	CsvJdbcBridge(String queueCapacity) {
 		log.info("Creating queue with capacity:${queueCapacity}")
 		queue = new ArrayBlockingQueue<Expando>(Integer.parseInt(queueCapacity))
 		CsvFileReader._readerDelegate = this
@@ -78,7 +77,7 @@ class CsvJdbcBridge implements TableReader, Trigger {
 	 * @param tableName
 	 * @param file
 	 */
-	public void addTable(@Header("type") String tableName, @Payload File file) {
+	void addTable(@Header("type") String tableName, @Payload File file) {
 		def entry = new Expando()
 		entry.table = tableName
 		entry.file = file
@@ -95,7 +94,7 @@ class CsvJdbcBridge implements TableReader, Trigger {
 	 * @param payload
 	 * @return
 	 */
-	public String getTable(payload) {
+	String getTable(payload) {
 		return currentEntry.table
 	}
 	
@@ -105,7 +104,7 @@ class CsvJdbcBridge implements TableReader, Trigger {
 	 * @param payload
 	 * @return
 	 */
-	public File getOriginalFile(payload) {
+	File getOriginalFile(payload) {
 		return currentEntry.file
 	}
 	/**
@@ -118,7 +117,7 @@ class CsvJdbcBridge implements TableReader, Trigger {
 	 * @param table
 	 * @return
 	 */
-	public Message<?> moveSourceFile(Message<?> message, @Header("original_file") file, @Header("type") table) {
+	Message<?> moveSourceFile(Message<?> message, @Header("original_file") file, @Header("type") table) {
 		if (file == null) {
 			log.error("Tried to move source file with no valid file reference.")
 			return
@@ -145,7 +144,7 @@ class CsvJdbcBridge implements TableReader, Trigger {
      * @param table  - used as destination file name
      * @return message
      */
-    public Message<?> moveSourceFileUsingHarvestType(Message<?> message, @Header("original_file")File originalFile, @Header("harvestType") harvestType, @Header("type") table) {
+    Message<?> moveSourceFileUsingHarvestType(Message<?> message, @Header("original_file")File originalFile, @Header("harvestType") harvestType, @Header("type") table) {
         if (originalFile == null) {
             log.error("Tried to move source file with no valid file reference.")
             return
@@ -184,7 +183,7 @@ class CsvJdbcBridge implements TableReader, Trigger {
 	 * Pops the head of the queue and sets it as the current entry being processed. 
 	 */
 	@Override
-	public Reader getReader(Statement statement, String tableName) throws SQLException {
+	Reader getReader(Statement statement, String tableName) throws SQLException {
 		def entry = queue.take()
 		currentEntry = entry
 		return new FileReader(entry.file)
@@ -195,7 +194,7 @@ class CsvJdbcBridge implements TableReader, Trigger {
 	 * 
 	 */
 	@Override
-	public List<String> getTableNames(Connection conn) throws SQLException {
+	List<String> getTableNames(Connection conn) throws SQLException {
 		return new ArrayList<String>()
 	}
 
@@ -206,7 +205,7 @@ class CsvJdbcBridge implements TableReader, Trigger {
 	 * 
 	 */
 	@Override
-	public Date nextExecutionTime(TriggerContext arg0) {
+	Date nextExecutionTime(TriggerContext arg0) {
 		synchronized(this) {
 			while(queue.size() == 0) {
 				this.wait()
