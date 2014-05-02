@@ -173,11 +173,10 @@ class JsonTransformationHandler {
             log.debug("JSON message payload: ${data}")
         }
         final Message<String> message = MessageBuilder.withPayload(data)
-                .setHeader("type", type)
+                .setHeader("harvestType", harvestType)
                 .setHeader("original_file", origFile)
                 .setHeader(FileHeaders.ORIGINAL_FILE, origFile)
                 .build()
-
         return message
     }
 	
