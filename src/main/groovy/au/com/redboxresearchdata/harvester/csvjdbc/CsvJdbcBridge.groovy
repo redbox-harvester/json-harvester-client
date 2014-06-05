@@ -31,6 +31,7 @@ import org.springframework.integration.annotation.Payload
 import org.springframework.scheduling.Trigger
 import org.springframework.scheduling.TriggerContext
 import org.springframework.integration.Message
+import org.springframework.integration.context.OrderlyShutdownCapable
 
 /**
  * Bridges Spring Integration's file and JDBC mechanisms for CSVJDBC's file-specific awareness.
@@ -40,7 +41,7 @@ import org.springframework.integration.Message
  * @author Shilo Banihit
  * @since 1.0
  */
-class CsvJdbcBridge implements TableReader, Trigger {
+class CsvJdbcBridge implements TableReader, Trigger, OrderlyShutdownCapable {
 
 	private static final Logger log = Logger.getLogger(CsvJdbcBridge.class)
 	/**
@@ -59,6 +60,8 @@ class CsvJdbcBridge implements TableReader, Trigger {
 	 * The config object
 	 */
 	ConfigObject config
+	
+	boolean shuttingDown = false
 	
 	/**
 	 * Creates a bridge with the initial capacity.
@@ -168,7 +171,7 @@ class CsvJdbcBridge implements TableReader, Trigger {
     private File createParentDirectory(String directoryName) {
         File directory = new File(directoryName)
         // do not create non-existent parent directories
-        directory.mkdir()
+        directory.mkdirs()
         if (log.isDebugEnabled()) {
             log.debug("directory created: '${directory}'.")
         } else {
@@ -206,11 +209,35 @@ class CsvJdbcBridge implements TableReader, Trigger {
 	 */
 	@Override
 	Date nextExecutionTime(TriggerContext arg0) {
+		log.debug "Called nextExecutionTime..."
 		synchronized(this) {
-			while(queue.size() == 0) {
+			while(queue.size() == 0 && !shuttingDown) {
+				log.debug "Called nextExecutionTime...waiting."
 				this.wait()
-			}
+				log.debug "Called nextExecutionTime...notified."
+			}			
+			log.info "Called nextExecutionTime...shuttingDown:${shuttingDown}"
+			return shuttingDown ? null : new Date(System.currentTimeMillis())
 		}
-		return new Date(System.currentTimeMillis())
+	}
+	
+	@Override
+	public int beforeShutdown() {
+		log.info "Orderly shutdown command received - beforeShutdown"
+		synchronized(this) {
+			shuttingDown = true
+			this.notifyAll()
+		}
+		return channelInterceptor.sendCount.intValue()
+	}
+	
+	@Override
+	public int afterShutdown() {
+		log.info "Orderly shutdown command received - afterShutdown"
+		synchronized(this) {
+			shuttingDown = true
+			this.notifyAll()
+		}
+		return channelInterceptor.sendCount.intValue()
 	}
 }
