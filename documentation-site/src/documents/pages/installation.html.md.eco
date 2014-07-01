@@ -1,0 +1,28 @@
+---
+title: Installation
+layout: page 
+pageOrder: 2
+---
+Although technically possible, this core or base project in itself is not meant to be installed in a production setting.
+
+Please return to the [main Harvester documentation][parentDoc] and select a more specific implementation.
+
+However, if you want to play around with the base implementation, the base implementation can be executed using the packaged sample configuration. 
+Amongst others, the base implementation has sample configuration to send JSON files to [ReDBox][redboxUrl] as a ReDBox dataset. 
+
+To play around with the sample configuration, do the following:
+
+1. Download the base harvester client. The latest development snapshot version can be [downloaded here][hcSnapLatest]
+2. Expand the zip file.
+3. Create a "input" directory within the expanded directory.
+4. Download a [sample JSON file from here][sampleDatasetJson], placing it inside the "input" directory.
+5. Run the latest ReDBox software. For instructions on how to install ReDBox, [go here][redboxUrl]
+6. Go to the expanded directory and execute the "harvest_file.bat" or "harvest_file.sh" depending on your OS.
+
+You should then see a ReDBox dataset with workflow status of "Metadata Review".
+
+
+[parentDoc]: <%= @parent.url %> "Main Harvester Documentation"
+[hcSnapLatest]: http://dev.redboxresearchdata.com.au/nexus/service/local/artifact/maven/redirect?r=snapshots&g=au.com.redboxresearchdata&a=json-harvester-client&v=LATEST&c=bin&e=zip "Harvester Client Latest snapshot"
+[redboxUrl]: http://www.redboxresearchdata.com.au "ReDBox URL"
+[sampleDatasetJson]: https://raw.githubusercontent.com/redbox-harvester/redbox-dataset-jdbc-harvester-template/master/src/main/resources/resources/scripts/template-data/dataset-template.json "Sample Dataset JSON File"

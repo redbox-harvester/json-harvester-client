@@ -1,4 +1,4 @@
-/*******************************************************************************
+/*
 *Copyright (C) 2014 Queensland Cyber Infrastructure Foundation (http://www.qcif.edu.au/)
 *
 *This program is free software: you can redistribute it and/or modify
@@ -14,7 +14,7 @@
 *You should have received a copy of the GNU General Public License along
 *with this program; if not, write to the Free Software Foundation, Inc.,
 *51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-******************************************************************************/
+*/
 package au.com.redboxresearchdata.harvester.json.transformer
 
 import groovy.json.JsonBuilder
@@ -49,7 +49,11 @@ class JsonVelocityTransformer {
 	private static final Logger logger = Logger.getLogger(JsonVelocityTransformer.class)
 	ConfigObject config	
 	VelocityEngine ve
-			
+	
+	/**
+	 * Inits the VelocityEngine, and sets properties.
+	 * 		
+	 */
 	private void initVelocity() {
 		ve = new VelocityEngine()
 		logger.debug("Template dir:${config.velocityTransformer.templateDir}")
@@ -63,6 +67,13 @@ class JsonVelocityTransformer {
 		}
 	}
 	
+	/**
+	 * Executes the configured Velocity templates.
+	 * 
+	 * @param inputMessage - payload is a String of JSON format
+	 * @param type - qualifies which templates should be executed.
+	 * @return
+	 */
 	@Transformer
 	public Message<String> handleMessage(final Message<String> inputMessage, @Header("type") String type) {
 		String dataStr = inputMessage.getPayload()		

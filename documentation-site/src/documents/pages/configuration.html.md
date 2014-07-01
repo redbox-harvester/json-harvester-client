@@ -1,0 +1,45 @@
+```
+title: Configuration
+layout: page
+pageOrder: 3
+```
+
+A typical Harvester Client is configured through 2 files: a Spring Integration definition file (XML) and a configuration file written in Groovy's flexible, environment-aware [ConfigSlurper][ConfigSlurper] format. The latter configuration is loaded by the system through the [Config][ConfigUtilSrc] utility class. That class requires specific entries to be present before it can be successfully loaded. For details, please see its documentation.
+
+The ConfigSlurper format config file entries may vary, depending on [how the Harvester Client is installed][Install]. 
+
+## Spring Integration Configuration
+The XML file configures the Spring Integration channel definitions. This is the main configuration file of the Harvester Client. [Here's a sample.][SampleXMLConfig]
+
+## Environment-specific and miscellaneous configuration
+Entries in this file supplement the Spring Integration configuration, as well as provide configuration values to other external applications, such as the Harvester Manager. [Here's a sample.][SampleConfig]
+
+This page will intentionally omit the description of the individual entries of this file, since often these are specific to the implementation. However, to provide a gentle introduction, the section below will describe the sample configuration referred to in this document.
+
+## Sample Configuration: JSON File --> ReDBox Dataset
+The sample configuration has to be installed as a console application and will do the following:
+1. Monitor a specific input directory for .json files
+2. Send the file contents verbatim to ReDBox
+3. Move the file to the input directory
+
+This page will not describe the Spring Integration configuration elements, [please see its documentation][SI-Main].
+
+### Sample Configuration
+The elements below are critical entries in the configuration.
+#### client.siPath
+The path to the Spring Integration configuration file
+#### harvest.directory 
+The directory that will be monitored for JSON files
+#### harvest.output.json.directory
+The directory where JSON files are moved post-processing.
+#### activemq.url
+The ActiveMQ url where the data will be sent.
+
+
+[ConfigSlurper]: http://groovy.codehaus.org/ConfigSlurper "ConfigSlurper Format Doco"
+[ConfigUtilSrc]: https://github.com/redbox-mint-contrib/utilities/blob/master/src/main/groovy/au/com/redboxresearchdata/util/config/Config.groovy "Config Utility source"
+[Install]: installation "Installation Documentation"
+[SampleXMLConfig]: https://github.com/redbox-harvester/json-harvester-client/blob/master/src/main/resources/sample/config/integration/spring-integration-file.xml "Sample SI config"
+[SampleConfig]: https://github.com/redbox-harvester/json-harvester-client/blob/master/src/main/resources/sample/config/config-file.groovy "Sample Groovy Config"
+[DatasetTemplate]:https://github.com/redbox-harvester/redbox-dataset-jdbc-harvester-template/blob/master/src/main/resources/resources/scripts/template-data/dataset-template.json "ReDBox Dataset Template"
+[SI-Main]: http://projects.spring.io/spring-integration/ "Spring Integration Project Site"

@@ -29,7 +29,6 @@
 		<groovy.version>2.3.1</groovy.version>
 		<csvjdbc.version>1.0.13</csvjdbc.version>		
 		<jython.version>2.5.3</jython.version>
-		
 		<mainClass>au.com.redboxresearchdata.harvester.json.client.Main</mainClass>
 	</properties>
 
@@ -70,7 +69,13 @@
 	      <plugin>
 	        <groupId>org.codehaus.gmavenplus</groupId>
 	        <artifactId>gmavenplus-plugin</artifactId>
-	        <version>1.1</version>
+	        <version>1.2</version>
+	        <configuration>
+	        	<windowTitle>API-ReDBox Harvester Client</windowTitle>
+	        	<groovydocOutputDirectory>documentation-site/src/files/apidocs</groovydocOutputDirectory>
+	        	<docTitle>ReDBox Harvester - Base Client API </docTitle>
+	        	<footer>ReDBox Harvester - Base Client API - Copyright (C) 2014 Queensland Cyber Infrastructure Foundation (http://www.qcif.edu.au/)</footer>
+	        </configuration>
 	        <executions>
 	          <execution>
 	            <goals>	              
@@ -136,19 +141,7 @@
 		            </manifest>
 		          </archive>
 		        </configuration>
-	        </plugin>
-	        <plugin>
-              <groupId>org.apache.maven.plugins</groupId>
-              <artifactId>maven-site-plugin</artifactId>
-              <version>3.2</version>
-              <dependencies>
-                <dependency>
-                  <groupId>org.apache.maven.doxia</groupId>
-                  <artifactId>doxia-module-markdown</artifactId>
-                  <version>1.5</version>
-                </dependency>
-              </dependencies>
-            </plugin>                       			
+	        </plugin>                   			
 		</plugins>
 	</build>
 
