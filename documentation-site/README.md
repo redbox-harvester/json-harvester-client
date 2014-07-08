@@ -3,5 +3,5 @@
 
 The [ReDBox][redboxUrl] [Harvester Client][clientUrl] documentation.
 
-[clientUrl]: http://harvester-snapshot.redboxresearchdata.com.au/ "HC URL"
+[clientUrl]: http://harvester-client-snapshot.redboxresearchdata.com.au/ "HC URL"
 [redboxUrl]: http://www.redboxresearchdata.com.au "ReDBox URL"

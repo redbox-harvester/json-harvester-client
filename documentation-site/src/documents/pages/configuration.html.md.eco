@@ -35,15 +35,6 @@ The elements below are critical entries in the configuration.
   <tr>
   	<td>client.siPath</td>
   	<td>
-  		Required. The path to the Spring Integration configuration file.
-  	</td>
-  	<td>
-  		The uniqueness applies to the context of the integration environment. The uniqueness is not tested and must be verified externally as part of the integration work.
-  	</td>
-  </tr>
-  <tr>
-  	<td>client.siPath</td>
-  	<td>
   		The path to the Spring Integration configuration file.
   	</td>
   	<td>
