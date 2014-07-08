@@ -51,7 +51,7 @@ import au.com.redboxresearchdata.util.config.Config;
  * 
  * Otherwise, the client will continue to run while the Spring application context is running or while the main thread isn't interrupted while sleeping.
  *
- * @author Shilo Banihit
+ * @author <a href="https://github.com/shilob" target="_blank">Shilo Banihit</a>
  * @since 1.0
  *
  */

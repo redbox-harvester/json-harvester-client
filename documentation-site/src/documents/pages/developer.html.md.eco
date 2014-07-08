@@ -1,0 +1,154 @@
+```
+title: Developer
+layout: page
+pageOrder: 4
+```
+
+Much can be accomplished using the Harvester just by editing its configuration and creating scripts. 
+To get more out of the Harvester however, this page provides more in depth developer information.
+It outlines information on how to further customize the tool, for example by using other Spring Integration components and other classes available on this project and the <a href="<%= @utility.url %>" class="rewritable-url">Utility library</a>.
+
+#### Source
+[Reference implementation][RefImplSrc]
+
+[Base project used in reference implementation][BaseImplSrc]
+
+[Utility library][UtilitySrc]
+
+#### Binaries
+[Latest reference implementation snapshot builds][RefImplBinSnap]
+
+## Development Approach
+The reference implementation is built on top of the base implementation. Unless you are changing core functionality, it is recommended that you implement your own harvester similarly: on top of the base implementation, adding your own libraries as dependencies and made available in the classpath upon execution. While going through this document, you are encouraged to examine the reference implementation. 
+
+
+### IDE Set up - Reference Implementation
+Recommended IDE: Either [Spring Source Tools or Grails Tools Suite][SpringTools]. Clone the source in your workspace and add it as an existing Maven application.
+
+## Components
+A typical client is composed of:
+1. Configuration
+2. Classes that hook into the Spring Integration channels in order to transform and pre-process / post-process the data.
+
+Configuration is further broken down to:
+1. A Spring Integration configuration.
+2. Configuration file that is available from the Spring Integration configuration via this [handy class][ConfigSlurpConfigurer]. This is loaded by the <a href="<%= @utility.url %>pages/config" class="rewritable-url">Config Utility class</a>.
+
+### Configuration
+#### Spring Integration
+Spring Integration (SI) is used to connect to the data sources, perform any transformation, and then finally transmit the JSON documents to the server. Typically, there should be at most one inbound endpoint, and at least one outbound endpoint.
+Inbound or outbound endpoints usually are Channel Adapters, although other endpoints can be used.
+
+    <int-file:inbound-channel-adapter id="filesIn" directory="${harvest.directory}" filename-pattern="*.json">
+        <int:poller id="poller" fixed-rate="${harvest.pollRate}" max-messages-per-poll="${harvest.queueCapacity}" />
+    </int-file:inbound-channel-adapter>
+    
+Also, it is recommended that you expose the beans in JMX:
+
+    <int-jmx:mbean-export id="mbeanExporterRedboxJdbcHarvester" default-domain="au.com.redboxresearchdata.harvester.client.sample.jdbc" server="mbeanServer"/>
+
+Amongst others, it would allow you to shut down the tool gracefully. To do so, get a reference of the bean and call the stop method like so:
+    mbeanExporter.stopActiveComponents(false, gracefulShutdownTimeout)
+
+#### Reference Implementation Goals
+1. Access a JDBC data source
+2. Transform the JDBC ResultSets data into JSON
+3. Send it to ReDBox Dataset JSON Harvester
+4. Poll for new records
+
+To achieve this, the implementation uses:
+1. A JDBC Inbound adapter to execute the SQL query
+2. The JsonTransformationHandler class and Groovy scripts to build the required JSON document.
+3. A JMS Outbound adapter to send the JSON
+4. A Groovy script to update the SQL query's timestamp
+
+Before you move on, you must clarify what your implementation goals are. This will help you decide how you will structure your SI configuration, and which components you will need to use to achieve your goals. The section below outlines components available in the base, Utility and reference implementation projects that you may find useful in your own project. Please note that these are in addition to what Spring and Spring Integration offers. Please consult Spring and Spring Integration documentation so as not to unnecessarily reinvent the wheel.
+
+### Base implementation Components
+<table class="table table-bordered table-striped">
+  <tr>
+    <th>Name</th>
+    <th>Description</th>
+  </tr>
+  <tr>
+    <td>Main</td>
+    <td>Convenience class to load Spring Integration configuration files.</td>
+  </tr>
+  <tr>
+  	<td>JsonTransformationHandler</td>
+  	<td>
+  		This SI Transformer has methods used in processing SI messages, as well as prepare a JSON document for the ReDBox GenericJSON Harvester. The class main relies on the JsonFactory to build the JSON document.
+	</td>
+  </tr>
+  <tr>
+  	<td>ConfigSqlParameterSource</td>
+  	<td>
+  		Exposes entries in the "harvest.jdbc.<type>.sqlParam" <a href="<%= @utility.url %>pages/config" class="rewritable-url" configuration</a> map as SQL parameters.
+  	</td>
+  </tr>
+  <tr>
+  	<td>JsonVelocityTransformer</td>
+  	<td>
+  		SI transformer for accepting a message with a JSON String payload and executing Velocity templates passing the message string payload as a parsed JSON map, directly available to the template.
+  	</td>
+  </tr>
+  <tr>
+  	<td>GenericJsonSplitter</td>
+  	<td>
+  		SI Splitter for JSON documents, splitting the source JSON top-level "data" array. If "copyPayloadFieldsToHeader" class member array is specified, entries of the source JSON "header" top level field that matches the name in the member array is copied to each new element. All SI message headers are copied to the resulting new message.
+  	</td>
+  </tr>
+  <tr>
+  	<td>CloningJsonSplitter</td>
+  	<td>
+  		SI Splitter for JSON documents. Clones the incoming JSON by examining the field specified at 'config.cloningSplitter.srcArray' entry. The elements of the field are then appended to the header specified at 'config.cloningSplitter.modifyHeader', prefixed with "_". All SI message headers are copied to the resulting new message.
+  	</td>
+  </tr>
+  <tr>
+  	<td>CsvJdbcBridge</td>
+  	<td>
+  		Convenience class for parsing CSV files into JDBC ResultSets while retaining file-awareness throughout the SI messaging pipeline. This class uses a third-party library [CSVJDBC][CsvJdbc] to parse files.
+  	</td>
+  </tr>
+  <tr>
+  	<td>CsvFileReader</td>
+  	<td>
+  		Reader class for CSVJDBC Driver. Delegates all calls to a static instance of CsvJdbcBridge. Required if you want to use the CsvJdbcBridge.
+  	</td>
+  </tr>
+</table>
+
+<table class="table table-bordered table-striped">
+  <tr>
+    <th>Name</th>
+    <th>Description</th>
+  </tr>
+  <tr>
+  	<td>JsonFactory</td>
+  	<td>
+  		Convenience class for building a JSON String from a List of Maps, becoming the "data" array of the output JSON document (aka the payload). The JSON String is primarily targeted for ReDBox GenericJSON Harvester. It builds the required headers and other metadata like the Harvester id, hostname, etc. This class populates the payload entries using the keys of the Map as field names. If you want to manipulate the map entries, there are three stages that in the processing cycle where you can specify JVM scripts(Groovy, Jython, etc.) to perform your own processing: "preBuild", "preAssemble" and "postBuild". See reference implementation configuration for samples and explanation.
+  	</td>
+  </tr>
+  <tr>
+  	<td>Config</td>
+  	<td>
+  		See <a href="<%= @utility.url %>pages/config" class="rewritable-url">Config documentation</a>
+  	</td>
+  </tr>
+  <tr>
+  	<td>ScriptExecutor</td>
+  	<td>
+  		Convenience class for launching JVM supported scripts.
+  	</td>
+  </tr>
+</table>
+
+[Utility]:<%= @utility.url %> "Utility library URL"
+[ConfigUtility]:<%= @utility.url %>pages/config
+[RefImplSrc]:https://github.com/redbox-harvester/redbox-dataset-jdbc-harvester-template
+[BaseImplSrc]:https://github.com/redbox-harvester/json-harvester-client
+[UtilitySrc]:https://github.com/redbox-harvester/utilities
+[RefImplBinSnap]: http://dev.redboxresearchdata.com.au/nexus/service/local/artifact/maven/redirect?r=snapshots&g=au.com.redboxresearchdata&a=redbox-dataset-jdbc-harvester-template&v=LATEST&c=bin&e=zip "Reference Implementation Snapshot Binary"
+[SpringTools]:http://spring.io/tools
+[ConfigSlurpConfigurer]:https://github.com/redbox-harvester/utilities/blob/master/src/main/java/au/com/redboxresearchdata/util/config/ConfigSlurperPlaceholderConfigurer.java
+[CsvJdbc]:http://csvjdbc.sourceforge.net/

@@ -38,7 +38,7 @@ import org.springframework.integration.context.OrderlyShutdownCapable
  * 
  * The assumption is that the instance is used in linear fashion, as in a chain.
  * 
- * @author Shilo Banihit
+ * @author <a href="https://github.com/shilob" target="_blank">Shilo Banihit</a>
  * @since 1.0
  */
 class CsvJdbcBridge implements TableReader, Trigger, OrderlyShutdownCapable {

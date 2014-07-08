@@ -5,7 +5,7 @@ pageOrder: 2
 ---
 Although technically possible, this core or base project in itself is not meant to be installed in a production setting.
 
-Please return to the [main Harvester documentation][parentDoc] and select a more specific implementation.
+Please return to the <a href="<%= @parent.url %>" class="rewritable-url">main Harvester documentation</a> and select a more specific implementation.
 
 However, if you want to play around with the base implementation, the base implementation can be executed using the packaged sample configuration. 
 Amongst others, the base implementation has sample configuration to send JSON files to [ReDBox][redboxUrl] as a ReDBox dataset. 

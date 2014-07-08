@@ -38,7 +38,7 @@ import au.com.redboxresearchdata.json.JsonFactory
  * 
  * Transformer for creating JSON strings using the JsonFactory class.
  * 
- * @author <a href="https://github.com/shilob">Shilo Banihit</a>
+ * @author <a href="https://github.com/shilob" target="_blank">Shilo Banihit</a>
  *
  */
 class JsonTransformationHandler {

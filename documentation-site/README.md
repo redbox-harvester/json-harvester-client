@@ -1,8 +1,7 @@
 [harvester-client-snapshot.redboxresearchdata.com.au][clientUrl]
 ==========================
 
-The [ReDBox][redboxUrl] [Harvester Client][clientUrl] [gateway doco site][gatewayUrl].
+The [ReDBox][redboxUrl] [Harvester Client][clientUrl] documentation.
 
-[clientUrl]: http://harvester-snapshot.redboxresearchdata.com.au/ "Gateway URL"
-[gatewayUrl]: http://harvester-snapshot.redboxresearchdata.com.au/ "Gateway URL"
+[clientUrl]: http://harvester-snapshot.redboxresearchdata.com.au/ "HC URL"
 [redboxUrl]: http://www.redboxresearchdata.com.au "ReDBox URL"

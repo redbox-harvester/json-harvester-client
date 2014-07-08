@@ -4,9 +4,9 @@ layout: page
 pageOrder: 3
 ```
 
-A typical Harvester Client is configured through 2 files: a Spring Integration definition file (XML) and a configuration file written in Groovy's flexible, environment-aware [ConfigSlurper][ConfigSlurper] format. The latter configuration is loaded by the system through the [Config][ConfigUtilSrc] utility class. That class requires specific entries to be present before it can be successfully loaded. For details, please see its documentation.
+A typical Harvester Client is configured through 2 files: a Spring Integration definition file (XML) and a configuration file written in Groovy's flexible, environment-aware [ConfigSlurper][ConfigSlurper] format. The latter configuration is loaded by the system through the [Config][ConfigUtilSrc] utility class. That class requires specific entries to be present before it can be successfully loaded. For details, please see its <a href="<%= @utility.url %>pages/config" class="rewritable-url">documentation</a>.
 
-The ConfigSlurper format config file entries may vary, depending on [how the Harvester Client is installed][Install]. 
+The ConfigSlurper format config file entries may vary, depending on <a href="installation" class="rewritable-url">how the Harvester Client is installed</a>. 
 
 ## Spring Integration Configuration
 The XML file configures the Spring Integration channel definitions. This is the main configuration file of the Harvester Client. [Here's a sample.][SampleXMLConfig]
@@ -26,15 +26,57 @@ This page will not describe the Spring Integration configuration elements, [plea
 
 ### Sample Configuration
 The elements below are critical entries in the configuration.
-#### client.siPath
-The path to the Spring Integration configuration file
-#### harvest.directory 
-The directory that will be monitored for JSON files
-#### harvest.output.json.directory
-The directory where JSON files are moved post-processing.
-#### activemq.url
-The ActiveMQ url where the data will be sent.
-
+<table class="table table-bordered table-striped">
+  <tr>
+    <th>Configuration Entry</th>
+    <th>Purpose</th>
+    <th>Remarks</th>
+  </tr>
+  <tr>
+  	<td>client.siPath</td>
+  	<td>
+  		Required. The path to the Spring Integration configuration file.
+  	</td>
+  	<td>
+  		The uniqueness applies to the context of the integration environment. The uniqueness is not tested and must be verified externally as part of the integration work.
+  	</td>
+  </tr>
+  <tr>
+  	<td>client.siPath</td>
+  	<td>
+  		The path to the Spring Integration configuration file.
+  	</td>
+  	<td>
+  		The uniqueness applies to the context of the integration environment. The uniqueness is not tested and must be verified externally as part of the integration work.
+  	</td>
+  </tr>
+  <tr>
+  	<td>harvest.directory</td>
+  	<td>
+  		The directory that will be monitored for JSON files
+  	</td>
+  	<td>
+  		The path can be relative to the installation directory.
+  	</td>
+  </tr>
+  <tr>
+  	<td>harvest.output.json.directory</td>
+  	<td>
+  		The directory where JSON files are moved post-processing.
+  	</td>
+  	<td>
+  		The path can be relative to the installation directory.
+  	</td>
+  </tr>
+  <tr>
+  	<td>activemq.url</td>
+  	<td>
+  		The ActiveMQ url where the data will be sent.
+  	</td>
+  	<td>
+  	</td>
+  </tr>
+</table>
 
 [ConfigSlurper]: http://groovy.codehaus.org/ConfigSlurper "ConfigSlurper Format Doco"
 [ConfigUtilSrc]: https://github.com/redbox-mint-contrib/utilities/blob/master/src/main/groovy/au/com/redboxresearchdata/util/config/Config.groovy "Config Utility source"
@@ -43,3 +85,4 @@ The ActiveMQ url where the data will be sent.
 [SampleConfig]: https://github.com/redbox-harvester/json-harvester-client/blob/master/src/main/resources/sample/config/config-file.groovy "Sample Groovy Config"
 [DatasetTemplate]:https://github.com/redbox-harvester/redbox-dataset-jdbc-harvester-template/blob/master/src/main/resources/resources/scripts/template-data/dataset-template.json "ReDBox Dataset Template"
 [SI-Main]: http://projects.spring.io/spring-integration/ "Spring Integration Project Site"
+[ConfigDoco]:<%= @utility.url %>pages/config "Config class doco"

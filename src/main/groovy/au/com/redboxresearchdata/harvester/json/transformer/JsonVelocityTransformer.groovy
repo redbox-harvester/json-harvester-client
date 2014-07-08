@@ -42,7 +42,7 @@ import au.com.redboxresearchdata.util.script.ScriptExecutor;
  * 
  * This transformer also has pre and post Velocity execution scripting support.
  *  
- * @author <a href="https://github.com/shilob">Shilo Banihit</a>
+ * @author <a href="https://github.com/shilob" target="_blank">Shilo Banihit</a>
  * 
  */
 class JsonVelocityTransformer {

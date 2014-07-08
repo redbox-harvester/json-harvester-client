@@ -48,7 +48,7 @@ import org.springframework.integration.support.MessageBuilder
  * 
  *  The "copyPayloadFieldsToHeader" is a list of payload field names that should be copied to the header when these exist in the current element.
  * 
- * @author <a href="https://github.com/shilob">Shilo Banihit</a>
+ * @author <a href="https://github.com/shilob" target="_blank">Shilo Banihit</a>
  *
  */
 class GenericJsonSplitter {

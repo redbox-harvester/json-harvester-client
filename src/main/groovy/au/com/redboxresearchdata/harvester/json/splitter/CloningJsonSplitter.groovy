@@ -30,7 +30,7 @@ import groovy.util.Eval
  * 
  *  The elements of the field are then appended to the header specified at 'config.cloningSplitter.modifyHeader', prefixed with "_".
  * 
- * @author <a href="https://github.com/shilob">Shilo Banihit</a>
+ * @author <a href="https://github.com/shilob" target="_blank">Shilo Banihit</a>
  *
  */
 class CloningJsonSplitter {

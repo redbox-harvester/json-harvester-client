@@ -142,20 +142,29 @@ docpadConfig = {
 			templateData:
 				site:
 					url: "http://localhost:9779/"
+					project: "json-harvester-client"
 				parent:
 					url: "http://localhost:9778/"
+				utility:
+					url: "http://localhost:9780/"
 		static: # The version hosted at GH pages
 			templateData:
 				site:
 					url: "http://harvester-client-snapshot.redboxresearchdata.com.au/"
+					project: "json-harvester-client"
 				parent:
 					url: "http://harvester-snapshot.redboxresearchdata.com.au/"
+				utility:
+					url: "http://harvester-utilities-snapshot.redboxresearchdata.com.au/"
 		release: # The released version hosted at wherever.
 			templateData:
 				site:
 					url: "http://harvester-client-release.redboxresearchdata.com.au/"
+					project: "json-harvester-client"
 				parent:
 					url: "http://harvester-release.redboxresearchdata.com.au/"
+				utility:
+					url: "http://harvester-utilities-release.redboxresearchdata.com.au/"
 }
 
 

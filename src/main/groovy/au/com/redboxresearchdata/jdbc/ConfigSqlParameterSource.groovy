@@ -23,7 +23,7 @@ import org.springframework.jdbc.core.namedparam.AbstractSqlParameterSource
 /**
  * Exposes harvest.jdbc[type].sqlParam[name] entries in the config as a parameter.
  * 
- * @author Shilo Banihit
+ * @author <a href="https://github.com/shilob" target="_blank">Shilo Banihit</a>
  *
  */
 class ConfigSqlParameterSource extends AbstractSqlParameterSource {

@@ -28,7 +28,7 @@ import org.relique.io.TableReader;
 /**
  * Reader class for CSVJDBC Driver. Delegates all calls to CsvJdbcBridge.
  * 
- * @author Shilo Banihit
+ * @author <a href="https://github.com/shilob" target="_blank">Shilo Banihit</a>
  * @since 1.0
  */
 class CsvFileReader implements TableReader{
