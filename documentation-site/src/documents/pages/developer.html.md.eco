@@ -126,7 +126,44 @@ Before you move on, you must clarify what your implementation goals are. This wi
   <tr>
   	<td>JsonFactory</td>
   	<td>
-  		Convenience class for building a JSON String from a List of Maps, becoming the "data" array of the output JSON document (aka the payload). The JSON String is primarily targeted for ReDBox GenericJSON Harvester. It builds the required headers and other metadata like the Harvester id, hostname, etc. This class populates the payload entries using the keys of the Map as field names. If you want to manipulate the map entries, there are three stages that in the processing cycle where you can specify JVM scripts(Groovy, Jython, etc.) to perform your own processing: "preBuild", "preAssemble" and "postBuild". See reference implementation configuration for samples and explanation.
+  		Convenience class for building a JSON String from a List of Maps, becoming the "data" array of the output JSON document (aka the payload). The JSON String is primarily targeted for ReDBox GenericJSON Harvester. It builds the required headers and other metadata like the Harvester id, hostname, etc. This class populates the payload entries using the keys of the Map as field names. If you want to manipulate the map entries, there are three stages that in the processing cycle where you can specify JVM scripts(Groovy, Jython, etc.) to perform your own processing: "preBuild", "preAssemble" and "postBuild". 
+  		
+  		More information on custom processing:
+  		
+  		<table class="table table-bordered table-striped">
+		  <tr>
+		    <th>Configuration Entry</th>
+		    <th>Purpose</th>
+		    <th>Remarks</th>
+		  </tr>
+		  <tr>
+		  	<td>harvest.scripts.preBuild</td>
+		  	<td>
+		  		Optional. Array of script maps that is executed after a successful poll, but prior to building the JSON String.
+		  	</td>
+		  	<td>
+		  		The data is not passed to the script. The key of the map is the script file name while the value is the configuration path. Typically, scripts treat an empty string as "use your default configuration". In such cases, a script that is named as "[merge.groovy][mergeScript]", the configuration is "[merge-config.groovy][mergeScriptConfig]".
+		  	</td>
+		  </tr>
+		  <tr>
+		  	<td>harvest.scripts.preAssemble</td>
+		  	<td>
+		  		Optional. Array of script maps that is executed prior to building the JSON string.
+		  	</td>
+		  	<td>
+		  		Similar to "preBuild" settings, but the data (e.g. map) is passed to the script as the 'data' variable.
+		  	</td>
+		  </tr>
+		  <tr>
+		  	<td>harvest.scripts.postBuild</td>
+		  	<td>
+		  		Optional. Array of script maps that is executed after the JSON string is built, but prior to ending the poll.
+		  	</td>
+		  	<td>
+		  		Similar to "preBuild" settings.
+		  	</td>
+		  </tr>
+		</table>
   	</td>
   </tr>
   <tr>
@@ -152,3 +189,5 @@ Before you move on, you must clarify what your implementation goals are. This wi
 [SpringTools]:http://spring.io/tools
 [ConfigSlurpConfigurer]:https://github.com/redbox-harvester/utilities/blob/master/src/main/java/au/com/redboxresearchdata/util/config/ConfigSlurperPlaceholderConfigurer.java
 [CsvJdbc]:http://csvjdbc.sourceforge.net/
+[mergeScript]:https://github.com/redbox-mint-contrib/redbox-dataset-jdbc-harvester-template/blob/master/src/main/resources/resources/scripts/merge.groovy
+[mergeScriptConfig]:https://github.com/redbox-mint-contrib/redbox-dataset-jdbc-harvester-template/blob/master/src/main/resources/resources/scripts/merge-config.groovy
