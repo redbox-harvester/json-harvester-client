@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<!-- Meta -->
+	<meta charset="utf-8" />
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+
+	<!-- Use the .htaccess and remove these lines to avoid edge case issues.
+		 More info: h5bp.com/i/378 -->
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+
+	<!-- Our site title and description -->
+	<title>Developer | ReDBox Harvester - Client</title>
+	<meta name="description" content="Documentation for the ReDBox Harvester, a simple and flexible data integration tool." />
+	<meta name="keywords" content="ReDBox, Research, Data, Data Integration, Spring Integration, Spring, Groovy" />
+	<meta name="author" content="Shilo Banihit" />
+
+	<!-- Output DocPad produced meta elements -->
+	<meta name="generator" content="DocPad v6.69.0" />
+
+	<!-- Mobile viewport optimized: h5bp.com/viewport -->
+	<meta name="viewport" content="width=device-width" />
+
+	<!-- Icons -->
+		<link rel="shortcut icon" href="images/icons/favicon.ico">
+		<link rel="apple-touch-icon-precomposed" sizes="144x144" href="images/icons/apple-touch-icon-144-precomposed.png">
+		<link rel="apple-touch-icon-precomposed" sizes="114x114" href="images/icons/apple-touch-icon-114-precomposed.png">
+		<link rel="apple-touch-icon-precomposed" sizes="72x72" href="images/icons/apple-touch-icon-72-precomposed.png">
+		<link rel="apple-touch-icon-precomposed" href="images/icons/apple-touch-icon-57-precomposed.png">
+
+	<!-- Shims: IE6-8 support of HTML5 elements -->
+	<!--[if lt IE 9]>
+		<script async src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+	<![endif]-->
+
+	<script type="text/javascript">
+		var projName = "/json-harvester-client";
+		var siteUrl = "http://localhost:9779/";
+		var needsRewrite = function() {
+			var pathname = location.pathname;
+			return pathname.indexOf(projName) == 0 || pathname.indexOf("/release") == 0;
+		};
+		var getNewPath = function(projName, pathName) {
+			var newPath = projName;
+			if (pathName.indexOf(projName) == -1) {
+				newPath = "/release";
+				var releaseNumMatch = pathName.match(/\/release\/(.*)/);
+				if (releaseNumMatch != null && releaseNumMatch[1] != "") {
+					var pathCompArr = releaseNumMatch[1].split("/");
+					newPath = newPath + "/" + pathCompArr[0];
+				}
+			}
+			return newPath;
+		};
+		var parseUrl = function(url) {
+			var parser =  document.createElement('a');
+			parser.href = url;
+			return parser;
+		};
+		var writeElement = function(arr, prefix, suffix ) {
+			var rewrite = needsRewrite();
+			var newPath = "";
+			if (rewrite) {
+				newPath = getNewPath(projName, location.pathname);
+			} 
+			for (var i=0; i<arr.length; i++) {
+				var curPath = arr[i];
+				var parser = parseUrl(curPath); 
+				if (parser.host == location.host) {
+					curPath = newPath + curPath;
+				}
+				document.write(prefix+curPath+suffix);
+			}
+		};
+		
+		var writeStyles = function() {
+			var stylesArr = "/styles/twitter-bootstrap.css,/styles/style.css,/styles/stickyfooter.css".split(",");
+			var prefix = "<link  rel='stylesheet' href='";
+			var suffix = "' />";
+			writeElement(stylesArr, prefix, suffix);
+		};
+		
+		var writeScripts = function() {
+			var scriptsArr = "//cdnjs.cloudflare.com/ajax/libs/jquery/1.10.2/jquery.min.js,//cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js,/vendor/twitter-bootstrap/dist/js/bootstrap.min.js,/scripts/script.js".split(",");
+			var prefix = "<script defer='defer' src=\"";
+			var suffix = "\"></ script>";
+			writeElement(scriptsArr, prefix, suffix);
+		};
+		writeStyles();
+	</script>
+</head>
+<body>
+	<!-- Menu -->
+	<div class="navbar navbar-inverse navbar-fixed-top">
+		<div class="container">
+			<div class="navbar-header">
+				<button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+				</button>
+				<div class="navbar-brand"><a class="navbar-link rewritable-url" href="http://localhost:9778/">ReDBox Harvester</a> - <a class="navbar-link rewritable-url" href="http://localhost:9779/">Harvester Client </a></div>
+				
+			</div>
+			<div class="navbar-collapse collapse">
+				<ul class="nav navbar-nav">
+					
+						<li
+							typeof="sioc:Page"
+							about="/pages/overview"
+							class=""
+						>
+							<a href="/pages/overview" property="dc:title" class="rewritable-url" >
+								Overview
+							</a>
+						</li>
+					
+						<li
+							typeof="sioc:Page"
+							about="/pages/installation"
+							class=""
+						>
+							<a href="/pages/installation" property="dc:title" class="rewritable-url" >
+								Installation
+							</a>
+						</li>
+					
+						<li
+							typeof="sioc:Page"
+							about="/pages/configuration"
+							class=""
+						>
+							<a href="/pages/configuration" property="dc:title" class="rewritable-url" >
+								Configuration
+							</a>
+						</li>
+					
+						<li
+							typeof="sioc:Page"
+							about="/pages/developer"
+							class="active"
+						>
+							<a href="/pages/developer" property="dc:title" class="rewritable-url" >
+								Developer
+							</a>
+						</li>
+					
+
+					<li>
+					<a href="/apidocs/" class="rewritable-url" target="_blank">API</a>
+					</li>
+				</ul>
+			</div><!--/.navbar-collapse -->
+		</div>
+	</div>
+
+	<!-- Content -->
+	<div class="container">
+		<!-- Content -->
+		<section id="content" class="content">
+			<article id="page" class="page">
+	<h1>Developer</h1>
+	<div class="page-content"><p>Much can be accomplished using the Harvester just by editing its configuration and creating scripts. 
+To get more out of the Harvester however, this page provides more in depth developer information.
+It outlines information on how to further customize the tool, for example by using other Spring Integration components and other classes available on this project and the <a href="http://localhost:9780/" class="rewritable-url">Utility library</a>.</p>
+<h4 id="source">Source</h4>
+<p><a href="https://github.com/redbox-harvester/redbox-dataset-jdbc-harvester-template">Reference implementation</a></p>
+<p><a href="https://github.com/redbox-harvester/json-harvester-client">Base project used in reference implementation</a></p>
+<p><a href="https://github.com/redbox-harvester/utilities">Utility library</a></p>
+<h4 id="binaries">Binaries</h4>
+<p><a href="http://dev.redboxresearchdata.com.au/nexus/service/local/artifact/maven/redirect?r=snapshots&amp;g=au.com.redboxresearchdata&amp;a=redbox-dataset-jdbc-harvester-template&amp;v=LATEST&amp;c=bin&amp;e=zip" title="Reference Implementation Snapshot Binary">Latest reference implementation snapshot builds</a></p>
+<h2 id="development-approach">Development Approach</h2>
+<p>The reference implementation is built on top of the base implementation. Unless you are changing core functionality, it is recommended that you implement your own harvester similarly: on top of the base implementation, adding your own libraries as dependencies and made available in the classpath upon execution. While going through this document, you are encouraged to examine the reference implementation. </p>
+<h3 id="ide-set-up-reference-implementation">IDE Set up - Reference Implementation</h3>
+<p>Recommended IDE: Either <a href="http://spring.io/tools">Spring Source Tools or Grails Tools Suite</a>. Clone the source in your workspace and add it as an existing Maven application.</p>
+<h2 id="components">Components</h2>
+<p>A typical client is composed of:</p>
+<ol>
+<li>Configuration</li>
+<li>Classes that hook into the Spring Integration channels in order to transform and pre-process / post-process the data.</li>
+</ol>
+<p>Configuration is further broken down to:</p>
+<ol>
+<li>A Spring Integration configuration.</li>
+<li>Configuration file that is available from the Spring Integration configuration via this <a href="https://github.com/redbox-harvester/utilities/blob/master/src/main/java/au/com/redboxresearchdata/util/config/ConfigSlurperPlaceholderConfigurer.java">handy class</a>. This is loaded by the <a href="http://localhost:9780/pages/config" class="rewritable-url">Config Utility class</a>.</li>
+</ol>
+<h3 id="configuration">Configuration</h3>
+<h4 id="spring-integration">Spring Integration</h4>
+<p>Spring Integration (SI) is used to connect to the data sources, perform any transformation, and then finally transmit the JSON documents to the server. Typically, there should be at most one inbound endpoint, and at least one outbound endpoint.
+Inbound or outbound endpoints usually are Channel Adapters, although other endpoints can be used.</p>
+<pre><code>&lt;int-file:inbound-channel-adapter id=&quot;filesIn&quot; directory=&quot;${harvest.directory}&quot; filename-pattern=&quot;*.json&quot;&gt;
+    &lt;int:poller id=&quot;poller&quot; fixed-rate=&quot;${harvest.pollRate}&quot; max-messages-per-poll=&quot;${harvest.queueCapacity}&quot; /&gt;
+&lt;/int-file:inbound-channel-adapter&gt;
+</code></pre><p>Also, it is recommended that you expose the beans in JMX:</p>
+<pre><code>&lt;int-jmx:mbean-export id=&quot;mbeanExporterRedboxJdbcHarvester&quot; default-domain=&quot;au.com.redboxresearchdata.harvester.client.sample.jdbc&quot; server=&quot;mbeanServer&quot;/&gt;
+</code></pre><p>Amongst others, it would allow you to shut down the tool gracefully. To do so, get a reference of the bean and call the stop method like so:
+    mbeanExporter.stopActiveComponents(false, gracefulShutdownTimeout)</p>
+<h4 id="reference-implementation-goals">Reference Implementation Goals</h4>
+<ol>
+<li>Access a JDBC data source</li>
+<li>Transform the JDBC ResultSets data into JSON</li>
+<li>Send it to ReDBox Dataset JSON Harvester</li>
+<li>Poll for new records</li>
+</ol>
+<p>To achieve this, the implementation uses:</p>
+<ol>
+<li>A JDBC Inbound adapter to execute the SQL query</li>
+<li>The JsonTransformationHandler class and Groovy scripts to build the required JSON document.</li>
+<li>A JMS Outbound adapter to send the JSON</li>
+<li>A Groovy script to update the SQL query&#39;s timestamp</li>
+</ol>
+<p>Before you move on, you must clarify what your implementation goals are. This will help you decide how you will structure your SI configuration, and which components you will need to use to achieve your goals. The section below outlines components available in the base, Utility and reference implementation projects that you may find useful in your own project. Please note that these are in addition to what Spring and Spring Integration offers. Please consult Spring and Spring Integration documentation so as not to unnecessarily reinvent the wheel.</p>
+<h3 id="base-implementation-components">Base implementation Components</h3>
+<table class="table table-bordered table-striped">
+  <tr>
+    <th>Name</th>
+    <th>Description</th>
+  </tr>
+  <tr>
+    <td>Main</td>
+    <td>Convenience class to load Spring Integration configuration files.</td>
+  </tr>
+  <tr>
+      <td>JsonTransformationHandler</td>
+      <td>
+          This SI Transformer has methods used in processing SI messages, as well as prepare a JSON document for the ReDBox GenericJSON Harvester. The class main relies on the JsonFactory to build the JSON document.
+    </td>
+  </tr>
+  <tr>
+      <td>ConfigSqlParameterSource</td>
+      <td>
+          Exposes entries in the &quot;harvest.jdbc.<type>.sqlParam&quot; <a href="http://localhost:9780/pages/config" class="rewritable-url" configuration</a> map as SQL parameters.
+      </td>
+  </tr>
+  <tr>
+      <td>JsonVelocityTransformer</td>
+      <td>
+          SI transformer for accepting a message with a JSON String payload and executing Velocity templates passing the message string payload as a parsed JSON map, directly available to the template.
+      </td>
+  </tr>
+  <tr>
+      <td>GenericJsonSplitter</td>
+      <td>
+          SI Splitter for JSON documents, splitting the source JSON top-level &quot;data&quot; array. If &quot;copyPayloadFieldsToHeader&quot; class member array is specified, entries of the source JSON &quot;header&quot; top level field that matches the name in the member array is copied to each new element. All SI message headers are copied to the resulting new message.
+      </td>
+  </tr>
+  <tr>
+      <td>CloningJsonSplitter</td>
+      <td>
+          SI Splitter for JSON documents. Clones the incoming JSON by examining the field specified at &#39;config.cloningSplitter.srcArray&#39; entry. The elements of the field are then appended to the header specified at &#39;config.cloningSplitter.modifyHeader&#39;, prefixed with &quot;_&quot;. All SI message headers are copied to the resulting new message.
+      </td>
+  </tr>
+  <tr>
+      <td>CsvJdbcBridge</td>
+      <td>
+          Convenience class for parsing CSV files into JDBC ResultSets while retaining file-awareness throughout the SI messaging pipeline. This class uses a third-party library <a href="http://csvjdbc.sourceforge.net/">CSVJDBC</a> to parse files.
+      </td>
+  </tr>
+  <tr>
+      <td>CsvFileReader</td>
+      <td>
+          Reader class for CSVJDBC Driver. Delegates all calls to a static instance of CsvJdbcBridge. Required if you want to use the CsvJdbcBridge.
+      </td>
+  </tr>
+</table>
+
+<table class="table table-bordered table-striped">
+  <tr>
+    <th>Name</th>
+    <th>Description</th>
+  </tr>
+  <tr>
+      <td>JsonFactory</td>
+      <td>
+          Convenience class for building a JSON String from a List of Maps, becoming the &quot;data&quot; array of the output JSON document (aka the payload). The JSON String is primarily targeted for ReDBox GenericJSON Harvester. It builds the required headers and other metadata like the Harvester id, hostname, etc. This class populates the payload entries using the keys of the Map as field names. If you want to manipulate the map entries, there are three stages that in the processing cycle where you can specify JVM scripts(Groovy, Jython, etc.) to perform your own processing: &quot;preBuild&quot;, &quot;preAssemble&quot; and &quot;postBuild&quot;. 
+
+          More information on custom processing:
+
+          <table class="table table-bordered table-striped">
+          <tr>
+            <th>Configuration Entry</th>
+            <th>Purpose</th>
+            <th>Remarks</th>
+          </tr>
+          <tr>
+              <td>harvest.scripts.preBuild</td>
+              <td>
+                  Optional. Array of script maps that is executed after a successful poll, but prior to building the JSON String.
+              </td>
+              <td>
+                  The data is not passed to the script. The key of the map is the script file name while the value is the configuration path. Typically, scripts treat an empty string as &quot;use your default configuration&quot;. In such cases, a script that is named as &quot;<a href="https://github.com/redbox-mint-contrib/redbox-dataset-jdbc-harvester-template/blob/master/src/main/resources/resources/scripts/merge.groovy">merge.groovy</a>&quot;, the configuration is &quot;<a href="https://github.com/redbox-mint-contrib/redbox-dataset-jdbc-harvester-template/blob/master/src/main/resources/resources/scripts/merge-config.groovy">merge-config.groovy</a>&quot;.
+              </td>
+          </tr>
+          <tr>
+              <td>harvest.scripts.preAssemble</td>
+              <td>
+                  Optional. Array of script maps that is executed prior to building the JSON string.
+              </td>
+              <td>
+                  Similar to &quot;preBuild&quot; settings, but the data (e.g. map) is passed to the script as the &#39;data&#39; variable.
+              </td>
+          </tr>
+          <tr>
+              <td>harvest.scripts.postBuild</td>
+              <td>
+                  Optional. Array of script maps that is executed after the JSON string is built, but prior to ending the poll.
+              </td>
+              <td>
+                  Similar to &quot;preBuild&quot; settings.
+              </td>
+          </tr>
+        </table>
+      </td>
+  </tr>
+  <tr>
+      <td>Config</td>
+      <td>
+          See <a href="http://localhost:9780/pages/config" class="rewritable-url">Config documentation</a>
+      </td>
+  </tr>
+  <tr>
+      <td>ScriptExecutor</td>
+      <td>
+          Convenience class for launching JVM supported scripts.
+      </td>
+  </tr>
+</table>
+
+</div>
+</article>
+		</section>
+	</div><!-- /container -->
+	<!-- Footer -->
+	<div class="footer">
+		<div class="container">
+			<div class="col-md-6">
+				<div class="panel-body text-center">
+					<a href="http://localhost:9778/" class="btn btn-default btn-med rewritable-url">Main Documentation</a>
+				</div>
+			</div>
+			<div class="col-md-6">
+				<div class="panel-body text-center">
+					<a href="http://localhost:9779/" class="btn btn-default btn-med rewritable-url">Harvester Client Documentation</a>
+				</div>
+			</div>
+			<p class="pull-left">&copy; 2014 <a href="http://www.qcif.edu.au/" target="_blank">Queensland Cyber Infrastructure Foundation</a></p>
+			<p class="pull-right">This website was last updated at 2014-07-10T01:47:46.426Z</p>
+		</div>
+    </div>
+	<!-- Scripts -->
+	<script type="text/javascript">
+		onload = function () {
+			if (location.hostname.indexOf("github.io") >= 0) {
+				location.href = siteUrl + location.pathname.replace(projName+"/", "") + location.search + location.hash;
+			}
+			var pathname = location.pathname;
+			if (needsRewrite()) {
+				rewriteNavLinkUrl(projName, pathname);
+				rewriteImages(projName, pathname);
+			}
+		};		
+		var rewriteNavLinkUrl = function(projName, pathName) {
+			var newPath = getNewPath(projName, pathName);			
+			for (var i = 0; i < document.links.length; i++) {
+				if (document.links[i].className.indexOf("rewritable-url") >= 0 ) {
+					var parser = parseUrl(document.links[i].href);
+					document.links[i].href =  parser.protocol + "//" + parser.host + newPath + parser.pathname + parser.search + parser.hash;
+				}
+			}			
+		};
+		var rewriteImages = function(projName, pathName) {
+			var newPath = getNewPath(projName, pathName);			
+			for (var i = 0; i < document.images.length; i++) {
+				if (document.images[i].className.indexOf("rewritable-url") >= 0 ) {
+					var parser = parseUrl(document.images[i].src);
+					document.images[i].src =  parser.protocol + "//" + parser.host + newPath + parser.pathname + parser.search + parser.hash;
+				}
+			}			
+		};
+		writeScripts();
+	</script>
+</body>
+</html>

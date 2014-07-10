@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<!-- Meta -->
+	<meta charset="utf-8" />
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+
+	<!-- Use the .htaccess and remove these lines to avoid edge case issues.
+		 More info: h5bp.com/i/378 -->
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+
+	<!-- Our site title and description -->
+	<title>Installation | ReDBox Harvester - Client</title>
+	<meta name="description" content="Documentation for the ReDBox Harvester, a simple and flexible data integration tool." />
+	<meta name="keywords" content="ReDBox, Research, Data, Data Integration, Spring Integration, Spring, Groovy" />
+	<meta name="author" content="Shilo Banihit" />
+
+	<!-- Output DocPad produced meta elements -->
+	<meta name="generator" content="DocPad v6.69.0" />
+
+	<!-- Mobile viewport optimized: h5bp.com/viewport -->
+	<meta name="viewport" content="width=device-width" />
+
+	<!-- Icons -->
+		<link rel="shortcut icon" href="images/icons/favicon.ico">
+		<link rel="apple-touch-icon-precomposed" sizes="144x144" href="images/icons/apple-touch-icon-144-precomposed.png">
+		<link rel="apple-touch-icon-precomposed" sizes="114x114" href="images/icons/apple-touch-icon-114-precomposed.png">
+		<link rel="apple-touch-icon-precomposed" sizes="72x72" href="images/icons/apple-touch-icon-72-precomposed.png">
+		<link rel="apple-touch-icon-precomposed" href="images/icons/apple-touch-icon-57-precomposed.png">
+
+	<!-- Shims: IE6-8 support of HTML5 elements -->
+	<!--[if lt IE 9]>
+		<script async src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+	<![endif]-->
+
+	<script type="text/javascript">
+		var projName = "/json-harvester-client";
+		var siteUrl = "http://harvester-client-snapshot.redboxresearchdata.com.au/";
+		var needsRewrite = function() {
+			var pathname = location.pathname;
+			return pathname.indexOf(projName) == 0 || pathname.indexOf("/release") == 0;
+		};
+		var getNewPath = function(projName, pathName) {
+			var newPath = projName;
+			if (pathName.indexOf(projName) == -1) {
+				newPath = "/release";
+				var releaseNumMatch = pathName.match(/\/release\/(.*)/);
+				if (releaseNumMatch != null && releaseNumMatch[1] != "") {
+					var pathCompArr = releaseNumMatch[1].split("/");
+					newPath = newPath + "/" + pathCompArr[0];
+				}
+			}
+			return newPath;
+		};
+		var parseUrl = function(url) {
+			var parser =  document.createElement('a');
+			parser.href = url;
+			return parser;
+		};
+		var writeElement = function(arr, prefix, suffix ) {
+			var rewrite = needsRewrite();
+			var newPath = "";
+			if (rewrite) {
+				newPath = getNewPath(projName, location.pathname);
+			} 
+			for (var i=0; i<arr.length; i++) {
+				var curPath = arr[i];
+				var parser = parseUrl(curPath); 
+				if (parser.host == location.host) {
+					curPath = newPath + curPath;
+				}
+				document.write(prefix+curPath+suffix);
+			}
+		};
+		
+		var writeStyles = function() {
+			var stylesArr = "/styles/twitter-bootstrap.css,/styles/style.css,/styles/stickyfooter.css".split(",");
+			var prefix = "<link  rel='stylesheet' href='";
+			var suffix = "' />";
+			writeElement(stylesArr, prefix, suffix);
+		};
+		
+		var writeScripts = function() {
+			var scriptsArr = "//cdnjs.cloudflare.com/ajax/libs/jquery/1.10.2/jquery.min.js,//cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js,/vendor/twitter-bootstrap/dist/js/bootstrap.min.js,/scripts/script.js".split(",");
+			var prefix = "<script defer='defer' src=\"";
+			var suffix = "\"></ script>";
+			writeElement(scriptsArr, prefix, suffix);
+		};
+		writeStyles();
+	</script>
+</head>
+<body>
+	<!-- Menu -->
+	<div class="navbar navbar-inverse navbar-fixed-top">
+		<div class="container">
+			<div class="navbar-header">
+				<button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+				</button>
+				<div class="navbar-brand"><a class="navbar-link rewritable-url" href="http://harvester-snapshot.redboxresearchdata.com.au/">ReDBox Harvester</a> - <a class="navbar-link rewritable-url" href="http://harvester-client-snapshot.redboxresearchdata.com.au/">Harvester Client </a></div>
+				
+			</div>
+			<div class="navbar-collapse collapse">
+				<ul class="nav navbar-nav">
+					
+						<li
+							typeof="sioc:Page"
+							about="/pages/overview"
+							class=""
+						>
+							<a href="/pages/overview" property="dc:title" class="rewritable-url" >
+								Overview
+							</a>
+						</li>
+					
+						<li
+							typeof="sioc:Page"
+							about="/pages/installation"
+							class="active"
+						>
+							<a href="/pages/installation" property="dc:title" class="rewritable-url" >
+								Installation
+							</a>
+						</li>
+					
+						<li
+							typeof="sioc:Page"
+							about="/pages/configuration"
+							class=""
+						>
+							<a href="/pages/configuration" property="dc:title" class="rewritable-url" >
+								Configuration
+							</a>
+						</li>
+					
+						<li
+							typeof="sioc:Page"
+							about="/pages/developer"
+							class=""
+						>
+							<a href="/pages/developer" property="dc:title" class="rewritable-url" >
+								Developer
+							</a>
+						</li>
+					
+
+					<li>
+					<a href="/apidocs/" class="rewritable-url" target="_blank">API</a>
+					</li>
+				</ul>
+			</div><!--/.navbar-collapse -->
+		</div>
+	</div>
+
+	<!-- Content -->
+	<div class="container">
+		<!-- Content -->
+		<section id="content" class="content">
+			<article id="page" class="page">
+	<h1>Installation</h1>
+	<div class="page-content"><p>Although technically possible, this core or base project in itself is not meant to be installed in a production setting.</p>
+<p>Please return to the <a href="http://harvester-snapshot.redboxresearchdata.com.au/" class="rewritable-url">main Harvester documentation</a> and select a more specific implementation.</p>
+<p>However, if you want to play around with the base implementation, the base implementation can be executed using the packaged sample configuration. 
+Amongst others, the base implementation has sample configuration to send JSON files to <a href="http://www.redboxresearchdata.com.au" title="ReDBox URL">ReDBox</a> as a ReDBox dataset. </p>
+<p>To play around with the sample configuration, do the following:</p>
+<ol>
+<li>Download the base harvester client. The latest development snapshot version can be <a href="http://dev.redboxresearchdata.com.au/nexus/service/local/artifact/maven/redirect?r=snapshots&amp;g=au.com.redboxresearchdata&amp;a=json-harvester-client&amp;v=LATEST&amp;c=bin&amp;e=zip" title="Harvester Client Latest snapshot">downloaded here</a></li>
+<li>Expand the zip file.</li>
+<li>Create a &quot;input&quot; directory within the expanded directory.</li>
+<li>Download a <a href="https://raw.githubusercontent.com/redbox-harvester/redbox-dataset-jdbc-harvester-template/master/src/main/resources/resources/scripts/template-data/dataset-template.json" title="Sample Dataset JSON File">sample JSON file from here</a>, placing it inside the &quot;input&quot; directory.</li>
+<li>Run the latest ReDBox software. For instructions on how to install ReDBox, <a href="http://www.redboxresearchdata.com.au" title="ReDBox URL">go here</a></li>
+<li>Go to the expanded directory and execute the &quot;harvest_file.bat&quot; or &quot;harvest_file.sh&quot; depending on your OS.</li>
+</ol>
+<p>You should then see a ReDBox dataset with workflow status of &quot;Metadata Review&quot;.</p>
+</div>
+</article>
+		</section>
+	</div><!-- /container -->
+	<!-- Footer -->
+	<div class="footer">
+		<div class="container">
+			<div class="col-md-6">
+				<div class="panel-body text-center">
+					<a href="http://harvester-snapshot.redboxresearchdata.com.au/" class="btn btn-default btn-med rewritable-url">Main Documentation</a>
+				</div>
+			</div>
+			<div class="col-md-6">
+				<div class="panel-body text-center">
+					<a href="http://harvester-client-snapshot.redboxresearchdata.com.au/" class="btn btn-default btn-med rewritable-url">Harvester Client Documentation</a>
+				</div>
+			</div>
+			<p class="pull-left">&copy; 2014 <a href="http://www.qcif.edu.au/" target="_blank">Queensland Cyber Infrastructure Foundation</a></p>
+			<p class="pull-right">This website was last updated at 2014-07-10T05:35:48.089Z</p>
+		</div>
+    </div>
+	<!-- Scripts -->
+	<script type="text/javascript">
+		onload = function () {
+			if (location.hostname.indexOf("github.io") >= 0) {
+				location.href = siteUrl + location.pathname.replace(projName+"/", "") + location.search + location.hash;
+			}
+			var pathname = location.pathname;
+			if (needsRewrite()) {
+				rewriteNavLinkUrl(projName, pathname);
+				rewriteImages(projName, pathname);
+			}
+		};		
+		var rewriteNavLinkUrl = function(projName, pathName) {
+			var newPath = getNewPath(projName, pathName);			
+			for (var i = 0; i < document.links.length; i++) {
+				if (document.links[i].className.indexOf("rewritable-url") >= 0 ) {
+					var parser = parseUrl(document.links[i].href);
+					document.links[i].href =  parser.protocol + "//" + parser.host + newPath + parser.pathname + parser.search + parser.hash;
+				}
+			}			
+		};
+		var rewriteImages = function(projName, pathName) {
+			var newPath = getNewPath(projName, pathName);			
+			for (var i = 0; i < document.images.length; i++) {
+				if (document.images[i].className.indexOf("rewritable-url") >= 0 ) {
+					var parser = parseUrl(document.images[i].src);
+					document.images[i].src =  parser.protocol + "//" + parser.host + newPath + parser.pathname + parser.search + parser.hash;
+				}
+			}			
+		};
+		writeScripts();
+	</script>
+</body>
+</html>

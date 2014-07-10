@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+	<title>ReDBox Harvester - Client</title>
+	<link href="http://localhost:9779//atom.xml" rel="self"/>
+	<link href="http://localhost:9779/"/>
+	<updated>2014-07-10T01:47:46.426Z</updated>
+	<id>http://localhost:9779/</id>
+	<author>
+		<name>Shilo Banihit</name>
+		<email></email>
+	</author>
+
+	
+</feed>
