@@ -9,7 +9,7 @@ The Harvester Client is a generic tool for transferring data between systems. Th
 
 The Harvester Client implementation can be illustrated as such:
 
-![Harvester Client implementation diagram][img-HC_Core]
+<img src="/images/HarvesterClient-Implementation-HighLevel.png" class="rewritable-url" />
 
 ## Components
 ### Source
